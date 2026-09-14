@@ -155,7 +155,7 @@
       background:
         linear-gradient(90deg,rgba(4,16,29,.98) 0%,rgba(6,21,35,.9) 24%,rgba(8,28,45,.58) 55%,rgba(8,20,33,.72) 100%),
         linear-gradient(180deg,rgba(0,0,0,.08),rgba(4,17,28,.7)),
-        url("https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=2200&q=90") center/cover no-repeat;
+        url("https://www.jbs.com.br/wp-content/uploads/jbs-mediaroom/cac5f49dcdf1b51f.jpeg") center/cover no-repeat;
       transform:scale(1.02);
     }
 
@@ -785,6 +785,27 @@
       }
     }
 
+  
+    .link-card .open-btn{
+      background:rgba(29,82,125,.78);
+    }
+
+    .link-card .icon-box{
+      font-weight:800;
+      font-size:clamp(18px,1.6vw,26px);
+    }
+  
+    .weather-condition{
+      margin-top:2px;
+      color:#a9bfd1;
+      font-size:10px;
+      line-height:1.3;
+      max-width:130px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
   </style>
 </head>
 
@@ -802,6 +823,9 @@
         <button class="nav-btn" data-view="favorites">
           <span class="nav-icon">☆</span><span>Favoritos</span>
         </button>
+        <button class="nav-btn" data-view="links">
+          <span class="nav-icon">↗</span><span>Links Úteis</span>
+        </button>
         <button class="nav-btn" data-view="about">
           <span class="nav-icon">ⓘ</span><span>Sobre</span>
         </button>
@@ -817,6 +841,7 @@
         <div class="mobile-actions">
           <button title="Início" data-mobile-view="all">⌂</button>
           <button title="Favoritos" data-mobile-view="favorites">☆</button>
+          <button title="Links Úteis" data-mobile-view="links">↗</button>
         </div>
       </div>
 
@@ -825,7 +850,7 @@
           <div class="eyebrow">OPERATIONAL HUB</div>
           <h1>Tudo o que você precisa<br>para <span>operar melhor.</span></h1>
           <p class="hero-subtitle">
-            Aplicações e dashboards em um só lugar, para apoiar as rotinas operacionais do Terminal.
+            Aplicações e dashboards em um só lugar, para apoiar a rotina operacional do Terminal de Itajaí.
           </p>
 
           <label class="search">
@@ -836,10 +861,14 @@
 
           
         </div>
-        <div class="weather">
-            <div class="weather-top"><span>☀️</span><span>Itajaí, SC</span></div>
-            <div class="weather-temp">22°C</div>
-            <div class="weather-time" id="clock">Seg, 14 de Set<br>13:16</div>
+        <div class="weather" title="Clima atual em Itajaí">
+            <div class="weather-top">
+              <span id="weatherIcon">◌</span>
+              <span>Itajaí, SC</span>
+            </div>
+            <div class="weather-temp" id="weatherTemp">--°C</div>
+            <div class="weather-condition" id="weatherCondition">Atualizando...</div>
+            <div class="weather-time" id="clock"></div>
           </div>
       </section>
 
@@ -862,7 +891,7 @@
             <span>Operational Hub</span>
             <span class="divider">|</span>
             <span>v1.0</span>
-            <span class="developer-credit">Desenvolvido por Bruno Duarte</span>
+            <span class="developer-credit">JBS Terminais Itajaí</span>
           </footer>
         </div>
       </section>
@@ -880,7 +909,7 @@
         icon:"▥",
         accent:"#35d58c",
         iconBg:"rgba(0,154,94,.16)",
-        url:"https://brunosth-rgb.github.io/yard"
+        url:"#"
       },
       {
         id:"vessel-dashboard",
@@ -890,7 +919,7 @@
         icon:"⚓",
         accent:"#4bd6e6",
         iconBg:"rgba(0,178,197,.13)",
-        url:"https://brunosth-rgb.github.io/vessel"
+        url:"#"
       },
       {
         id:"gate-dashboard",
@@ -900,7 +929,7 @@
         icon:"◷",
         accent:"#ff8d53",
         iconBg:"rgba(237,95,39,.14)",
-        url:"https://brunosth-rgb.github.io/ttt"
+        url:"#"
       },
       {
         id:"yard-daily-projection",
@@ -910,7 +939,7 @@
         icon:"▥",
         accent:"#35d58c",
         iconBg:"rgba(0,154,94,.16)",
-        url:"https://brunosth-rgb.github.io/ydp"
+        url:"#"
       },
       {
         id:"escala",
@@ -934,6 +963,70 @@
         disabled:true
       }
     ];
+
+    const USEFUL_LINKS = [
+      {
+        id:"praticagem",
+        title:"Praticagem",
+        description:"Movimentação de navios da Praticagem ZP-21.",
+        tags:["Navios","Praticagem"],
+        icon:"⚓",
+        accent:"#4bd6e6",
+        iconBg:"rgba(0,178,197,.13)",
+        url:"https://praticoszp21.com.br/movimentacao-de-navios/"
+      },
+      {
+        id:"ogmo",
+        title:"OGMO",
+        description:"Acesso ao portal do OGMO Itajaí.",
+        tags:["Equipe","OGMO"],
+        icon:"👥",
+        accent:"#48a8ff",
+        iconBg:"rgba(0,105,255,.15)",
+        url:"https://www.ogmoitajai.com.br/portal/login.asp"
+      },
+      {
+        id:"windguru",
+        title:"Wind Guru",
+        description:"Previsão de vento e condições meteorológicas para Itajaí.",
+        tags:["Clima","Vento"],
+        icon:"≋",
+        accent:"#79d2ff",
+        iconBg:"rgba(64,169,224,.14)",
+        url:"https://www.windguru.cz/419450"
+      },
+      {
+        id:"mares",
+        title:"Tábua de Marés",
+        description:"Previsão de marés para Itajaí, Santa Catarina.",
+        tags:["Maré","Navegação"],
+        icon:"≈",
+        accent:"#57b8ff",
+        iconBg:"rgba(50,136,255,.14)",
+        url:"https://tabuademares.com/br/santa-catarina/itajai"
+      },
+      {
+        id:"navis",
+        title:"Navis N4",
+        description:"Acesso ao ambiente produtivo do Navis N4.",
+        tags:["TOS","Operação"],
+        icon:"N4",
+        accent:"#35d58c",
+        iconBg:"rgba(0,154,94,.16)",
+        url:"https://navisn4-prd.jbsterminais.com.br"
+      },
+      {
+        id:"portal-cliente",
+        title:"Portal do Cliente",
+        description:"Acesso ao Portal do Cliente JBS Terminais.",
+        tags:["Cliente","Portal"],
+        icon:"↗",
+        accent:"#ad6cff",
+        iconBg:"rgba(136,54,255,.14)",
+        url:"https://portal.jbsterminais.com.br/login?ReturnUrl=/"
+      }
+    ];
+
 
     const grid = document.getElementById("appsGrid");
     const searchInput = document.getElementById("searchInput");
@@ -981,12 +1074,45 @@
       `;
     }
 
+
+    function usefulLinkCard(link){
+      return `
+        <article class="app-card link-card"
+          data-link-id="${link.id}"
+          data-search="${[link.title, link.description, ...link.tags].join(" ").toLowerCase()}"
+          style="--accent:${link.accent};--icon-bg:${link.iconBg}">
+          <div class="card-top">
+            <div class="icon-box">${link.icon}</div>
+            <div>
+              <h3>${link.title}</h3>
+              <p>${link.description}</p>
+            </div>
+          </div>
+          <div class="card-bottom">
+            <div class="tags">
+              ${link.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+            </div>
+            <div class="actions">
+              <button class="open-btn" data-link-open="${link.id}" title="Abrir link">↗</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
     function render(){
       let items = APPS;
 
       if(currentView === "favorites"){
         items = APPS.filter(app => favorites.has(app.id));
         sectionTitle.textContent = "Favoritos";
+      }else if(currentView === "links"){
+        sectionTitle.textContent = "Links Úteis";
+        grid.innerHTML = USEFUL_LINKS.map(usefulLinkCard).join("");
+        emptyState.classList.remove("show");
+        filterCards();
+        bindLinkEvents();
+        return;
       }else{
         sectionTitle.textContent = "Aplicações Operacionais";
       }
@@ -997,7 +1123,6 @@
             <h3 style="margin-top:0">Sobre o Operational Hub</h3>
             <p style="font-size:14px;max-width:850px">
               Este hub centraliza dashboards, ferramentas e aplicações operacionais em um único ponto de acesso.
-              Os links podem ser configurados diretamente no bloco APPS do JavaScript.
             </p>
           </article>`;
         emptyState.classList.remove("show");
@@ -1037,9 +1162,19 @@
       });
     }
 
+    function bindLinkEvents(){
+      document.querySelectorAll("[data-link-open]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const link = USEFUL_LINKS.find(item => item.id === btn.dataset.linkOpen);
+          if(!link?.url) return;
+          window.open(link.url, "_blank", "noopener,noreferrer");
+        });
+      });
+    }
+
     function filterCards(){
       const term = searchInput.value.trim().toLowerCase();
-      const cards = [...document.querySelectorAll(".app-card[data-id]")];
+      const cards = [...document.querySelectorAll(".app-card[data-id], .app-card[data-link-id]")];
       let visible = 0;
 
       cards.forEach(card => {
@@ -1079,6 +1214,76 @@
       render();
     });
 
+
+    const WEATHER = {
+      latitude: -26.9101,
+      longitude: -48.6705,
+      refreshMs: 10 * 60 * 1000
+    };
+
+    function weatherCodeInfo(code, isDay = 1){
+      const day = Number(isDay) === 1;
+
+      if(code === 0) return { icon: day ? "☀️" : "🌙", label:"Céu limpo" };
+      if(code === 1) return { icon: day ? "🌤️" : "☁️", label:"Predominantemente limpo" };
+      if(code === 2) return { icon:"⛅", label:"Parcialmente nublado" };
+      if(code === 3) return { icon:"☁️", label:"Nublado" };
+      if(code === 45 || code === 48) return { icon:"🌫️", label:"Neblina" };
+      if(code === 51 || code === 53 || code === 55) return { icon:"🌦️", label:"Garoa" };
+      if(code === 56 || code === 57) return { icon:"🌧️", label:"Garoa congelante" };
+      if(code === 61 || code === 63) return { icon:"🌧️", label:"Chuva" };
+      if(code === 65) return { icon:"🌧️", label:"Chuva forte" };
+      if(code === 66 || code === 67) return { icon:"🌧️", label:"Chuva congelante" };
+      if(code === 71 || code === 73 || code === 75 || code === 77) return { icon:"❄️", label:"Neve" };
+      if(code === 80 || code === 81) return { icon:"🌦️", label:"Pancadas de chuva" };
+      if(code === 82) return { icon:"⛈️", label:"Pancadas fortes" };
+      if(code === 85 || code === 86) return { icon:"🌨️", label:"Pancadas de neve" };
+      if(code === 95) return { icon:"⛈️", label:"Trovoadas" };
+      if(code === 96 || code === 99) return { icon:"⛈️", label:"Trovoadas com granizo" };
+
+      return { icon:"🌡️", label:"Condição atual" };
+    }
+
+    async function updateWeather(){
+      const tempEl = document.getElementById("weatherTemp");
+      const iconEl = document.getElementById("weatherIcon");
+      const conditionEl = document.getElementById("weatherCondition");
+
+      try{
+        const url =
+          `https://api.open-meteo.com/v1/forecast?latitude=${WEATHER.latitude}` +
+          `&longitude=${WEATHER.longitude}` +
+          `&current=temperature_2m,weather_code,is_day` +
+          `&timezone=America%2FSao_Paulo`;
+
+        const response = await fetch(url, { cache:"no-store" });
+
+        if(!response.ok){
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const current = data.current;
+
+        if(!current || typeof current.temperature_2m !== "number"){
+          throw new Error("Dados meteorológicos inválidos");
+        }
+
+        const info = weatherCodeInfo(current.weather_code, current.is_day);
+
+        tempEl.textContent = `${Math.round(current.temperature_2m)}°C`;
+        iconEl.textContent = info.icon;
+        conditionEl.textContent = info.label;
+        conditionEl.title = info.label;
+      }catch(error){
+        console.warn("Não foi possível atualizar o clima:", error);
+        tempEl.textContent = "--°C";
+        iconEl.textContent = "🌡️";
+        conditionEl.textContent = "Clima indisponível";
+        conditionEl.title = "Não foi possível consultar o clima agora";
+      }
+    }
+
     function updateClock(){
       const now = new Date();
       const date = new Intl.DateTimeFormat("pt-BR",{
@@ -1096,6 +1301,10 @@
 
     updateClock();
     setInterval(updateClock, 30000);
+
+    updateWeather();
+    setInterval(updateWeather, WEATHER.refreshMs);
+
     render();
   </script>
 </body>
