@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Time de Gate | JBS Terminais Itajaí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* CONFIGURAÇÃO DO FIREBASE
+   Cole aqui o firebaseConfig do seu projeto: Console do Firebase > Configurações do projeto > Seus apps > App da Web.
+   Com os campos vazios, a aplicação funciona sem login e salva só no navegador. */
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYxUE1EBGBEONhPtl3tKI9KpwX87-Uc3Q",
+  authDomain: "time-gate-jbs.firebaseapp.com",
+  projectId: "time-gate-jbs",
+  storageBucket: "time-gate-jbs.firebasestorage.app",
+  messagingSenderId: "595247098020",
+  appId: "1:595247098020:web:a0428a39be57870a9dde31"
+};
+</script>
+<style>
+/* Estilo: livro-razão acromático. Cromo em tinta, cor só nos dados.
+   Grade: barra lateral 248px + área fluida com margem de 32px. Um único espaçamento de 12px entre blocos. */
+:root{
+  --ground:#F3F5F8; --surface:#FFFFFF; --raised:#EEF1F5; --active:#E6E9EE;
+  --border:#E3E6EB; --rule:#EEF0F3; --control:#CDD2DA;
+  --text:#0B0D12; --muted:#5E6470; --faint:#6B7180;
+  --primary:#111318; --onprimary:#FFFFFF;
+  --hue:#005ABE; --huePale:#E3EEFA; --hueInk:#0A3F80;
+  --night:#E1E6EE;
+  --negative:#C4242A; --negBg:#FFEDEA; --negInk:#831C1E;
+  --warnBg:#FFF8E6; --warnInk:#8A4B08; --warnLine:#F2D58A;
+  --okBg:#E3F5E8; --okInk:#14532D;
+  --neuBg:#EEF0F3; --neuInk:#3A3F48;
+  --tA:#E3ECF8; --iA:#1B4F91; --tB:#F6EBD7; --iB:#7A4E0E; --tC:#E4F0E0; --iC:#2F6420; --tD:#F5E2E9; --iD:#8A2846;
+  --hatch:#8A909B; --longleave:#5E6470;
+  --radius:8px; --rc:6px; --gap:12px; --pad:32px;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0B0B0C; --surface:#151517; --raised:#1E1F22; --active:#26282C;
+  --border:#26282C; --rule:#1F2023; --control:#45484E;
+  --text:#F2F3F5; --muted:#B4B7BD; --faint:#969AA2;
+  --primary:#F2F3F5; --onprimary:#0B0B0C;
+  --hue:#5AA2F5; --huePale:#132741; --hueInk:#A9CDF8;
+  --night:#24262A;
+  --negative:#EF6A6E; --negBg:#3A1A1C; --negInk:#F6A3A5;
+  --warnBg:#2E2410; --warnInk:#F0C46A; --warnLine:#5A4718;
+  --okBg:#14291B; --okInk:#86D39C; --neuBg:#222327; --neuInk:#C9CBD0;
+  --tA:#16263B; --iA:#9CC1F0; --tB:#33270F; --iB:#E7BC6E; --tC:#1A2B16; --iC:#A3D28E; --tD:#35171F; --iD:#EFA4BB;
+  --hatch:#7D828B; --longleave:#8A8F98;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#0B0B0C; --surface:#151517; --raised:#1E1F22; --active:#26282C;
+  --border:#26282C; --rule:#1F2023; --control:#45484E;
+  --text:#F2F3F5; --muted:#B4B7BD; --faint:#969AA2;
+  --primary:#F2F3F5; --onprimary:#0B0B0C;
+  --hue:#5AA2F5; --huePale:#132741; --hueInk:#A9CDF8;
+  --night:#24262A;
+  --negative:#EF6A6E; --negBg:#3A1A1C; --negInk:#F6A3A5;
+  --warnBg:#2E2410; --warnInk:#F0C46A; --warnLine:#5A4718;
+  --okBg:#14291B; --okInk:#86D39C; --neuBg:#222327; --neuInk:#C9CBD0;
+  --tA:#16263B; --iA:#9CC1F0; --tB:#33270F; --iB:#E7BC6E; --tC:#1A2B16; --iC:#A3D28E; --tD:#35171F; --iD:#EFA4BB;
+  --hatch:#7D828B; --longleave:#8A8F98;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;background:var(--ground);color:var(--text);font-family:Barlow,"Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--hue);outline-offset:2px}
+h1,h2,h3,h4{margin:0;font-weight:600}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+
+/* Estrutura */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 12px 16px;border-right:1px solid var(--border);background:var(--ground)}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px}
+.brand svg{flex:none}
+.brand b{display:block;font-size:16px;font-weight:600;line-height:20px}
+.brand span{display:block;font-size:12px;color:var(--muted);line-height:16px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border:0;background:transparent;border-radius:var(--rc);color:var(--muted);cursor:pointer;text-align:left;font-size:14px}
+.nav button svg{flex:none;stroke:currentColor}
+.nav button:hover{color:var(--text);background:var(--raised)}
+.nav button[aria-current="page"]{background:var(--active);color:var(--text);font-weight:500}
+.nav .badge{margin-left:auto;min-width:20px;height:18px;padding:0 6px;border-radius:9px;background:var(--negative);color:#fff;font-size:12px;font-weight:600;line-height:18px;text-align:center}
+.grouplabel{font-size:12px;color:var(--muted);padding:28px 10px 8px}
+.now{display:flex;flex-direction:column;gap:6px;padding:0 10px}
+.nowrow{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:8px;font-size:14px}
+.nowrow small{display:block;font-size:12px;color:var(--muted);line-height:14px}
+.nowrow .num{font-size:14px}
+.nowrow .num span{color:var(--muted)}
+.nownote{font-size:12px;color:var(--muted);padding-top:4px}
+.sidefoot{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px 0;font-size:12px;color:var(--muted);border-top:1px solid var(--border)}
+.sidefoot .dot{width:7px;height:7px;border-radius:50%;background:#2E9E57;flex:none}
+.sidefoot .local .dot{background:#D9971E}
+#sync{display:flex;align-items:center;gap:6px}
+.textbtn{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:4px 0;border-radius:var(--rc);font-size:12px}
+.textbtn:hover{color:var(--text);background:var(--raised)}
+.mbar{display:none}
+.app>div{min-width:0}
+main{padding:28px var(--pad) 64px;min-width:0}
+
+/* Identidade das equipes: monograma com tom claro */
+.mono{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:5px;font-size:12px;font-weight:600;line-height:1;flex:none;background:var(--neuBg);color:var(--neuInk)}
+.mono.lg{width:32px;height:32px;font-size:15px;border-radius:7px}
+.mono.Alpha{background:var(--tA);color:var(--iA)} .mono.Bravo{background:var(--tB);color:var(--iB)}
+.mono.Charlie{background:var(--tC);color:var(--iC)} .mono.Delta{background:var(--tD);color:var(--iD)}
+
+/* Linha de título */
+.titlerow{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.titlerow .t{margin-right:auto;min-width:260px;max-width:760px}
+.titlerow h1{font-size:24px;line-height:30px;font-weight:600}
+.finding{margin:4px 0 0;font-size:15px;line-height:22px;color:var(--muted)}
+.finding b{color:var(--text);font-weight:500}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* Controles */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:var(--rc);border:1px solid var(--control);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--text)}
+.btn.primary{background:var(--primary);color:var(--onprimary);border-color:var(--primary)}
+.btn.primary:hover{opacity:.88}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--text)}
+.btn.quiet:hover{background:var(--raised)}
+.btn.danger{color:var(--negative);border-color:transparent;background:transparent;padding:0 8px}
+.btn.danger:hover{background:var(--negBg)}
+.btn.icon{width:36px;padding:0}
+.btn:active{transform:translateY(1px)}
+.input,select.input{height:36px;padding:0 10px;border:1px solid var(--control);border-radius:var(--rc);background:var(--surface);min-width:0}
+textarea.input{height:auto;padding:8px 10px;resize:vertical}
+.input:focus{outline:2px solid var(--hue);outline-offset:-1px;border-color:transparent}
+.seg{display:inline-flex;align-items:center;border:1px solid var(--control);border-radius:var(--rc);background:var(--surface);height:36px}
+.seg button{height:34px;border:0;background:transparent;cursor:pointer;padding:0 10px;color:var(--text)}
+.seg button:hover{background:var(--raised)}
+.seg .lbl{padding:0 6px;min-width:120px;text-align:center;font-weight:500;text-transform:capitalize}
+.act{border:0;background:transparent;color:var(--text);font-weight:500;cursor:pointer;padding:4px 8px;border-radius:var(--rc);text-decoration:underline;text-decoration-color:var(--control);text-underline-offset:3px}
+.act:hover{background:var(--raised);text-decoration-color:var(--text)}
+
+/* Painéis */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.ph{display:flex;align-items:center;gap:12px;padding:16px 20px 12px;flex-wrap:wrap}
+.ph h2{font-size:16px;line-height:22px;margin-right:auto}
+.ph .sub{font-size:12px;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:var(--gap)}
+.cols2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--gap);align-items:start}
+
+/* Faixa de números: um contêiner dividido */
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+.strip>div{padding:16px 20px;border-left:1px solid var(--border)}
+.strip>div:first-child{border-left:0}
+.strip .l{font-size:13px;color:var(--muted);line-height:18px}
+.strip .v{font-size:30px;line-height:38px;font-weight:400;margin-top:4px}
+.strip .v small{font-size:16px;color:var(--muted)}
+.strip .v.neg{color:var(--negative)}
+.strip .s{font-size:12px;color:var(--muted);line-height:16px;margin-top:2px}
+
+/* Agora: o bloco que responde quem está no gate */
+.nowpanel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,.9fr)}
+.nowpanel>div{padding:18px 20px;border-left:1px solid var(--border);min-width:0}
+.nowpanel>div:first-child{border-left:0}
+.shiftlbl{font-size:13px;color:var(--muted)}
+.shiftteam{display:flex;align-items:center;gap:10px;margin-top:8px}
+.shiftteam b{font-size:24px;line-height:30px;font-weight:600}
+.shiftfig{margin-left:auto;font-size:30px;line-height:36px}
+.shiftfig small{font-size:16px;color:var(--muted)}
+.shiftout{margin-top:8px;font-size:13px;color:var(--muted);line-height:18px}
+.cyc{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.cyc .k{font-size:13px;color:var(--muted)}
+
+/* Folha de escala: equipe por dia */
+.sheetwrap{overflow-x:auto;margin:0 20px;padding-bottom:8px}
+.sheet{border-collapse:separate;border-spacing:2px;width:100%;min-width:900px;table-layout:fixed}
+.sheet th,.sheet td{padding:0;text-align:center}
+.sheet .tcol{width:132px;text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;box-shadow:-2px 0 0 var(--surface),2px 0 0 var(--surface)}
+.sheet thead th{font-size:12px;font-weight:400;color:var(--muted);line-height:14px;padding:2px 0 6px;cursor:pointer;border-radius:4px}
+.sheet thead th b{display:block;font-size:13px;font-weight:500;color:var(--text)}
+.sheet thead th.we{background:var(--raised)}
+.sheet thead th.today b,.sheet thead th.today{color:var(--hue)}
+.sheet thead th.today{box-shadow:inset 0 -2px 0 var(--hue)}
+.sheet thead th.sel{background:var(--active)}
+.sheet thead th.swap{box-shadow:inset 2px 0 0 var(--text)}
+.sheet td.tcol{padding:0 8px 0 0}
+.tname{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;height:38px}
+.tname small{font-weight:400;color:var(--muted);font-size:12px;margin-left:auto}
+.c{height:38px;border-radius:4px;font-size:13px;cursor:pointer;line-height:38px;color:var(--text);border:0;width:100%;padding:0;display:block}
+.c.off{background:transparent;color:transparent}
+.c.off.we{background:var(--rule)}
+.sheet thead th.we{background:var(--rule)}
+.c.d{background:var(--surface);box-shadow:inset 0 0 0 1px var(--border)}
+.c.n{background:var(--night)}
+.c.low{background:var(--negBg);color:var(--negInk);font-weight:600;box-shadow:none}
+.c.tight{box-shadow:inset 0 0 0 1px var(--negative)}
+.c.colsel{outline:2px solid var(--text);outline-offset:-1px}
+.c:hover:not(.off){outline:2px solid var(--hue);outline-offset:-1px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-3px;margin-right:6px}
+.lg-d{background:var(--surface);box-shadow:inset 0 0 0 1px var(--control)}
+.lg-n{background:var(--night)}
+.lg-low{background:var(--negBg)}
+.lg-tight{background:var(--surface);box-shadow:inset 0 0 0 1px var(--negative)}
+.lg-sw{box-shadow:inset 2px 0 0 var(--text);background:var(--rule)}
+
+.daydetail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--border)}
+.daydetail>div{padding:16px 20px 18px;min-width:0}
+.daydetail>div+div{border-left:1px solid var(--border)}
+.dh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dh b{font-size:15px;font-weight:600}
+.dh>span:last-child{color:var(--muted);font-size:13px;margin-left:auto}
+.people{list-style:none;margin:0;padding:0;columns:2;column-gap:20px}
+.people li{display:flex;align-items:center;gap:6px;min-height:30px;break-inside:avoid;border-bottom:1px solid var(--rule);font-size:14px}
+.people li.out{color:var(--muted)}
+.people li .pill{margin-left:auto}
+
+/* Pílulas */
+.pill{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:4px;font-size:12px;font-weight:500;white-space:nowrap;flex:none;background:var(--neuBg);color:var(--neuInk)}
+.pill.neg{background:var(--negBg);color:var(--negInk)}
+.pill.warn{background:var(--warnBg);color:var(--warnInk)}
+.pill.ok{background:var(--okBg);color:var(--okInk)}
+.pill.hue{background:var(--huePale);color:var(--hueInk)}
+
+/* Parâmetros: coluna de rótulo + painel */
+.settings{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;padding-top:28px;margin-top:28px;border-top:1px solid var(--border)}
+.settings h2{font-size:16px;line-height:22px}
+.settings p{color:var(--muted);margin:6px 0 0;font-size:14px;line-height:20px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 16px}
+.fgrid .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500}
+.field .hint{font-weight:400;color:var(--muted);font-size:12px;line-height:16px;margin-top:-2px}
+.formfoot{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:20px;flex-wrap:wrap}
+.formfoot .left{margin-right:auto}
+
+/* Equipes */
+.unassigned .rows{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;padding:0 20px 12px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);align-items:start}
+.crew{min-height:140px}
+.crew.drop,.unassigned.drop{outline:2px dashed var(--hue);outline-offset:2px}
+.crewh{display:flex;align-items:center;gap:10px;padding:16px 16px 4px}
+.crewh h2{font-size:18px;line-height:24px}
+.crewh .num{margin-left:auto;font-size:18px}
+.crewmeta{padding:0 16px 10px;font-size:13px;color:var(--muted);line-height:18px;border-bottom:1px solid var(--border)}
+.crewmeta b{font-weight:500;color:var(--text)}
+.rows{list-style:none;margin:0;padding:0 16px 8px}
+.row{position:relative;display:block;min-height:52px;padding:8px 0;border-bottom:1px solid var(--rule);cursor:grab}
+.row:last-child{border-bottom:0}
+.row.dragging{opacity:.35}
+.row .nm{font-size:14px;font-weight:500;line-height:19px;padding-right:4px}
+.row .meta{font-size:12px;color:var(--muted);line-height:16px;margin-top:2px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
+.row .meta .focal{color:var(--text);font-weight:500}
+.row select{position:absolute;right:0;top:8px;height:28px;font-size:12px;border:1px solid var(--control);background:var(--surface);border-radius:var(--rc);color:var(--text);padding:0 4px;width:104px;opacity:0;pointer-events:none;transition:opacity .12s}
+.row:hover select,.row select:focus{opacity:1;pointer-events:auto}
+@media (hover:none){.row select{position:static;opacity:1;pointer-events:auto;margin-top:6px}}
+.row:hover .nm{text-decoration:underline;text-decoration-color:var(--control);text-underline-offset:3px}
+.emptyrow{padding:14px 0;color:var(--muted);font-size:13px}
+.inactive{margin-top:var(--gap)}
+.inactive summary{cursor:pointer;padding:14px 20px;font-weight:500}
+.inactive .rows{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:20px;padding:0 20px 12px}
+
+/* Tabelas */
+.tablewrap{overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:14px}
+table.data th{font-size:12px;font-weight:400;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+table.data th.num{text-align:right}
+table.data td{padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.data tr:last-child td{border-bottom:0}
+table.data th:first-child,table.data td:first-child{padding-left:20px}
+table.data th:last-child,table.data td:last-child{padding-right:20px}
+table.data tbody tr.click{cursor:pointer}
+table.data tbody tr:hover td{background:var(--raised)}
+.two b{display:block;font-weight:500}
+.two small{display:block;font-size:12px;color:var(--muted);line-height:16px}
+.teamcell{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.dash{color:var(--faint)}
+.notice{display:flex;gap:12px;align-items:flex-start;background:var(--warnBg);border:1px solid var(--warnLine);color:var(--warnInk);border-radius:var(--radius);padding:12px 16px;font-size:14px;margin-bottom:var(--gap)}
+.notice ul{margin:4px 0 0;padding-left:18px}
+
+/* Linha do tempo de ausências */
+.tl{overflow-x:auto;padding:0 20px 16px}
+.tlin{min-width:980px}
+.tlhead{display:grid;grid-template-columns:200px minmax(0,1fr);font-size:12px;color:var(--muted)}
+.tlmonths{display:grid;border-bottom:1px solid var(--border)}
+.tlmonths div{padding:4px 6px;border-left:1px solid var(--rule);text-transform:capitalize;white-space:nowrap;overflow:hidden}
+.tlgroup{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);height:32px;padding-top:8px}
+.tlrow{display:grid;grid-template-columns:200px minmax(0,1fr);height:32px;align-items:center}
+.tlname{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px}
+.tltrack{position:relative;height:100%;border-bottom:1px solid var(--rule)}
+.tlmline{position:absolute;top:0;bottom:0;width:1px;background:var(--rule)}
+.tltoday{position:absolute;top:-6px;bottom:0;width:1px;background:var(--hue);z-index:2}
+.bar{position:absolute;top:6px;height:20px;border-radius:4px;font-size:11px;line-height:20px;padding:0 5px;overflow:hidden;white-space:nowrap;cursor:pointer;border:0;text-align:left}
+.bar.fer{background:var(--huePale);color:var(--hueInk);box-shadow:inset 3px 0 0 var(--hue)}
+.bar.ate{background:repeating-linear-gradient(135deg,var(--hatch) 0 1px,transparent 1px 5px);box-shadow:inset 0 0 0 1px var(--hatch);color:var(--text)} /* taste-skill-ignore: hachura de atestado */
+.bar.afa{background:var(--longleave);color:#fff}
+.bar.conf{box-shadow:inset 0 0 0 2px var(--negative)}
+.bar:hover{outline:2px solid var(--text);outline-offset:1px;z-index:3}
+.lgfer{background:var(--huePale);box-shadow:inset 3px 0 0 var(--hue)}
+.lgate{background:repeating-linear-gradient(135deg,var(--hatch) 0 1px,transparent 1px 4px);box-shadow:inset 0 0 0 1px var(--hatch)} /* taste-skill-ignore: hachura de atestado */
+.lgafa{background:var(--longleave)}
+.lgconf{box-shadow:inset 0 0 0 2px var(--negative)}
+
+/* Lista com barra fina */
+.barlist{list-style:none;margin:0;padding:0 20px 16px}
+.barlist li{padding:8px 0;border-bottom:1px solid var(--rule)}
+.barlist li:last-child{border-bottom:0}
+.barlist .top{display:flex;align-items:center;gap:8px;font-size:14px}
+.barlist .top .num{margin-left:auto}
+.barlist .top .num small{color:var(--muted);font-size:12px;margin-left:6px}
+.barlist .tr{height:3px;margin-top:6px;background:var(--rule);border-radius:2px}
+.barlist .tr i{display:block;height:100%;background:var(--text);border-radius:2px}
+.barlist .tr i.hi{background:var(--hue)}
+
+/* Diálogo e aviso */
+dialog{border:0;border-radius:10px;padding:0;background:var(--surface);color:var(--text);width:min(560px,94vw);box-shadow:0 18px 48px rgba(10,12,20,.22)}
+dialog::backdrop{background:rgba(10,12,20,.42)}
+dialog form{padding:22px 24px 20px}
+dialog h3{font-size:18px;line-height:24px;margin-bottom:18px}
+.warnbox{background:var(--warnBg);color:var(--warnInk);border-radius:var(--rc);padding:10px 12px;font-size:13px;margin-top:14px}
+.warnbox:empty{display:none}
+/* Login */
+.login{position:fixed;inset:0;z-index:80;background:var(--ground);display:grid;place-items:center;padding:24px}
+.login[hidden]{display:none}
+.loginbox{width:min(400px,100%)}
+.loginbox .brand{padding:0 0 28px}
+.loginbox h1{font-size:24px;line-height:30px;margin-bottom:4px}
+.loginbox p{color:var(--muted);margin:0 0 20px}
+.loginbox form{display:flex;flex-direction:column;gap:16px}
+.loginbox .btn.primary{height:40px}
+.loginmsg{background:var(--negBg);color:var(--negInk);border-radius:var(--rc);padding:10px 12px;font-size:13px}
+.loginmsg:empty{display:none}
+.loginmsg code{display:block;margin-top:6px;font-size:12px;user-select:all;word-break:break-all}
+#userBox{display:flex;align-items:center;gap:10px;width:100%}
+#userBox .who2{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#userBox:empty{display:none}
+.ro .btn.primary:not(.keep),.ro select[data-move],.ro .act,.ro .formfoot .btn.primary{display:none}
+#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(8px);background:var(--primary);color:var(--onprimary);padding:10px 16px;border-radius:var(--rc);font-weight:500;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.emptystate{padding:28px 20px;color:var(--muted)}
+.emptystate b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+
+/* Tablet e telefone */
+@media (max-width:1180px){
+  .board{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .unassigned .rows,.inactive .rows{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settings{grid-template-columns:1fr;gap:16px}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0;height:100%;z-index:40;transform:translateX(-100%);transition:transform .18s;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none}
+  .mbar{display:flex;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;height:48px;padding:0 12px;background:var(--ground);border-bottom:1px solid var(--border)}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--ground)}
+  .mbar b{font-size:16px;font-weight:600}
+  .mbar .who{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+  .closeside{display:inline-flex!important}
+  main{padding:20px 16px 56px}
+  .nowpanel{grid-template-columns:1fr 1fr}
+  .nowpanel>div:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid var(--border)}
+  .daydetail{grid-template-columns:1fr}
+  .daydetail>div+div{border-left:0;border-top:1px solid var(--border)}
+  .cols2{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .board,.unassigned .rows,.inactive .rows{grid-template-columns:1fr}
+  .nowpanel{grid-template-columns:1fr}
+  .nowpanel>div{border-left:0!important;border-top:1px solid var(--border)}
+  .nowpanel>div:first-child{border-top:0}
+  .strip{grid-auto-flow:row;grid-template-columns:1fr 1fr}
+  .strip>div{border-left:0;border-top:1px solid var(--border)}
+  .strip>div:nth-child(-n+2){border-top:0}
+  .strip>div:nth-child(even){border-left:1px solid var(--border)}
+  .strip .v{font-size:26px}
+  .people{columns:1}
+  .fgrid{grid-template-columns:1fr}
+  .titlerow h1{font-size:22px}
+  .tools{width:100%}
+  .tools .grow{flex:1}
+  .btn,.input,select.input{height:40px}
+  .seg{height:40px}.seg button{height:38px}
+}
+.closeside{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="Navegação">
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="11" width="5" height="18" rx="1" fill="currentColor"/><rect x="7" y="12" width="23" height="5" rx="1" fill="var(--surface)" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="12" width="4" height="5" fill="var(--hue)"/><rect x="19" y="12" width="4" height="5" fill="var(--hue)"/><circle cx="5.5" cy="14.5" r="1.4" fill="var(--surface)"/></svg>
+      <div><b>Time de Gate</b><span>JBS Terminais Itajaí</span></div>
+      <button class="btn icon quiet closeside" id="closeSide" aria-label="Fechar menu" style="margin-left:auto"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l10 10M13 3L3 13"/></svg></button>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-tab="escala"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3M5 9h1M8 9h1M11 9h1M5 11.5h1M8 11.5h1"/></svg><span>Escala operacional</span></button>
+      <button data-tab="equipes"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><circle cx="6" cy="5.5" r="2.5"/><path d="M1.5 13.5c.5-2.5 2.3-4 4.5-4s4 1.5 4.5 4"/><path d="M10.5 3.2a2.4 2.4 0 1 1 0 4.6M12 9.8c1.3.5 2.2 1.8 2.5 3.7"/></svg><span>Equipes</span></button>
+      <button data-tab="ferias"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="2" y="5" width="12" height="8.5" rx="1.5"/><path d="M5.5 5V3.2c0-.4.3-.7.7-.7h3.6c.4 0 .7.3.7.7V5M2 8.5h12"/></svg><span>Férias</span></button>
+      <button data-tab="afast"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="3" y="2.5" width="10" height="11.5" rx="1.5"/><path d="M6 2.5V1.8h4v.7M8 6v4M6 8h4"/></svg><span>Atestados e afastamentos</span></button>
+    </nav>
+    <div class="grouplabel">Em serviço agora</div>
+    <div class="now" id="nowBox"></div>
+    <div class="sidefoot"><span id="userBox"></span><span id="sync" class="local"><i class="dot"></i><span>Carregando</span></span><button class="textbtn" id="themeBtn">Tema escuro</button></div>
+  </aside>
+  <div>
+    <div class="mbar"><button class="btn icon quiet" id="openSide" aria-label="Abrir menu"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 4.5h13M2.5 9h13M2.5 13.5h13"/></svg></button><b id="mtitle">Time de Gate</b><span class="who" id="mwho"></span></div>
+    <main id="main"></main>
+  </div>
+</div>
+<div class="login" id="login" hidden>
+  <div class="loginbox">
+    <div class="brand"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="11" width="5" height="18" rx="1" fill="currentColor"/><rect x="7" y="12" width="23" height="5" rx="1" fill="var(--surface)" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="12" width="4" height="5" fill="var(--hue)"/><rect x="19" y="12" width="4" height="5" fill="var(--hue)"/><circle cx="5.5" cy="14.5" r="1.4" fill="var(--surface)"/></svg><div><b>Time de Gate</b><span>JBS Terminais Itajaí</span></div></div>
+    <h1>Entrar</h1>
+    <p>Use o email e a senha cadastrados pelo administrador.</p>
+    <form id="loginForm">
+      <div class="loginmsg" id="loginMsg"></div>
+      <label class="field">Email<input class="input" type="email" name="email" autocomplete="username" required></label>
+      <label class="field">Senha<input class="input" type="password" name="senha" autocomplete="current-password" required></label>
+      <button class="btn primary keep" id="loginBtn">Entrar</button>
+      <button type="button" class="act" id="forgot" style="align-self:flex-start;padding-left:0">Esqueci minha senha</button>
+    </form>
+  </div>
+</div>
+<dialog id="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ===================== Utilidades de data ===================== */
+const TEAMS=['Alpha','Bravo','Charlie','Delta'];
+const TEAM_VAR={Alpha:'--alpha',Bravo:'--bravo',Charlie:'--charlie',Delta:'--delta'};
+const tc=t=>t?`var(${TEAM_VAR[t]})`:'var(--muted)';
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const pad=n=>String(n).padStart(2,'0');
+const P=s=>{const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)};
+const I=t=>{const d=new Date(t);return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`};
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+const addDays=(s,n)=>I(P(s)+n*864e5);
+const diff=(a,b)=>Math.round((P(b)-P(a))/864e5);
+const addMonths=(s,n)=>{const [y,m,d]=s.split('-').map(Number);const t=new Date(Date.UTC(y,m-1+n,1));const last=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0)).getUTCDate();t.setUTCDate(Math.min(d,last));return I(t.getTime())};
+const addYears=(s,n)=>addMonths(s,12*n);
+const fmt=s=>s?`${s.slice(8,10)}/${s.slice(5,7)}/${s.slice(0,4)}`:'';
+const fmtS=s=>s?`${s.slice(8,10)}/${s.slice(5,7)}`:'';
+const wd=s=>new Date(P(s)).getUTCDay();
+const validISO=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const titleCase=s=>s.toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).replace(/\s(Da|De|Do|Dos|Das|E)\s/g,m=>m.toLowerCase());
+
+/* ===================== Estado ===================== */
+const DEFAULT_CFG={
+  refDate:'2026-10-26', refDupla:'CD', semestreInicio:'2026-07-01', mesesTroca:6,
+  diurnoCD:'Charlie', diurnoAB:'Alpha', minTurno:0, limiteDias:305, maxFeriasEquipe:2, confirmado:false
+};
+const S={func:{},fer:{},afa:{},cfg:{...DEFAULT_CFG},tab:'equipes',month:todayISO().slice(0,7),selDay:todayISO(),
+  q:'',ferTeam:'',ferStatus:'',afaMonth:todayISO().slice(0,7),afaTeam:'',afaTipo:'',ready:false};
+
+/* ===================== Armazenamento ===================== */
+// Usa o banco compartilhado do artifact quando disponível; senão salva no navegador.
+const LKEY='timeGate.v1';
+const Store={
+  mode:'local',db:null,
+  loadLocal(){try{const j=JSON.parse(localStorage.getItem(LKEY)||'null');if(j){S.func=j.func||{};S.fer=j.fer||{};S.afa=j.afa||{};S.cfg={...DEFAULT_CFG,...(j.cfg||{})}}}catch(e){}},
+  saveLocal(){if(this.mode!=='local')return;try{localStorage.setItem(LKEY,JSON.stringify({func:S.func,fer:S.fer,afa:S.afa,cfg:S.cfg}))}catch(e){}},
+  colMap:{func:'funcionarios',fer:'ferias',afa:'afastamentos'},
+  unsubs:[],
+  async init(){
+    const fc=window.FIREBASE_CONFIG;
+    if(fc&&fc.apiKey&&fc.projectId){
+      if(!window.firebase){showLogin('Não foi possível carregar o Firebase. Verifique a conexão com a internet e recarregue a página.');return}
+      return this.initFirebase(fc);
+    }
+    this.loadLocal(); S.ready=true; setSync(); renderAll();
+    if(!(window.claude&&typeof window.claude.use==='function'))return;
+    let db=null;try{db=await window.claude.use('db')}catch(e){}
+    if(!db)return;
+    this.db=db;this.mode='db';S.func={};S.fer={};S.afa={};S.cfg={...DEFAULT_CFG};S.ready=false;setSync();renderAll();
+    this.subscribe();
+  },
+  subscribe(){
+    const db=this.db;let pending=3;
+    for(const [k,col] of Object.entries(this.colMap)){
+      this.unsubs.push(db.collection(col).onSnapshot(snap=>{
+        const o={};snap.docs.forEach(d=>{o[d.id]=d.data()});S[k]=o;
+        if(pending>0){pending--; if(pending===0){S.ready=true;setSync()}}
+        scheduleRender();
+      },err=>toast('Erro ao ler '+col+': '+(err&&err.message||err.code))));
+    }
+    this.unsubs.push(db.doc('config/escala').onSnapshot(d=>{S.cfg={...DEFAULT_CFG,...(d.exists?d.data():{})};scheduleRender()},()=>{}));
+  },
+  // Login e dados compartilhados pelo Firebase (Authentication + Firestore)
+  initFirebase(fc){
+    firebase.initializeApp(fc);this.auth=firebase.auth();this.db=firebase.firestore();this.mode='db';this.fb=true;
+    S.ready=false;setSync();
+    this.auth.onAuthStateChanged(async u=>{
+      this.unsubs.forEach(f=>{try{f()}catch(e){}});this.unsubs=[];
+      S.func={};S.fer={};S.afa={};S.cfg={...DEFAULT_CFG};S.ready=false;S.user=null;
+      if(!u){showLogin();renderAll();return}
+      let perfil=null;
+      try{const d=await this.db.doc('usuarios/'+u.uid).get();if(d.exists)perfil=d.data()}catch(e){}
+      if(!perfil||perfil.ativo===false){
+        const uidTxt=u.uid;await this.auth.signOut();
+        showLogin('Este acesso ainda não foi liberado. Envie ao administrador o código abaixo para incluir você na lista de usuários.',uidTxt);return}
+      S.user={uid:u.uid,email:u.email,nome:perfil.nome||u.email,perfil:perfil.perfil||'leitura'};
+      document.body.classList.toggle('ro',!['editor','admin'].includes(S.user.perfil));
+      hideLogin();setSync();renderAll();this.subscribe();
+    });
+  },
+  async login(email,senha){return this.auth.signInWithEmailAndPassword(email,senha)},
+  async logout(){if(this.auth)await this.auth.signOut()},
+  async reset(email){return this.auth.sendPasswordResetEmail(email)},
+  async put(k,id,data){
+    S[k][id]=data;scheduleRender();
+    if(this.mode==='db'){try{await this.db.collection(this.colMap[k]).doc(id).set(data)}catch(e){toast('Não foi possível salvar: '+(e.message||e.code))}}
+    else this.saveLocal();
+  },
+  async del(k,id){
+    delete S[k][id];scheduleRender();
+    if(this.mode==='db'){try{await this.db.collection(this.colMap[k]).doc(id).delete()}catch(e){toast('Não foi possível excluir: '+(e.message||e.code))}}
+    else this.saveLocal();
+  },
+  async putCfg(cfg){
+    S.cfg=cfg;scheduleRender();
+    if(this.mode==='db'){try{await this.db.doc('config/escala').set(cfg)}catch(e){toast('Não foi possível salvar: '+(e.message||e.code))}}
+    else this.saveLocal();
+  }
+};
+function setSync(){
+  const el=document.getElementById('sync');const ub=document.getElementById('userBox');
+  if(Store.mode==='db'){el.className='sync';el.querySelector('span').textContent=S.ready?(Store.fb?'Sincronizado':'Dados compartilhados'):'Sincronizando'}
+  else{el.className='sync local';el.querySelector('span').textContent='Salvo neste navegador'}
+  if(ub)ub.innerHTML=S.user?`<span class="who2" title="${esc(S.user.email)}">${esc(S.user.nome)}${document.body.classList.contains('ro')?', somente leitura':''}</span><button class="textbtn" id="logoutBtn">Sair</button>`:'';
+  const lo=document.getElementById('logoutBtn');if(lo)lo.onclick=()=>Store.logout();
+}
+let rq=null;function scheduleRender(){if(rq)return;rq=requestAnimationFrame(()=>{rq=null;renderAll(true)})}
+
+/* ===================== Regras da escala ===================== */
+const otherPair=p=>p==='CD'?'AB':'CD';
+const PAIRS={CD:['Charlie','Delta'],AB:['Alpha','Bravo']};
+function semestreIndex(date){
+  const c=S.cfg;let k=0;const step=Math.max(1,+c.mesesTroca||6);
+  if(date>=c.semestreInicio){while(addMonths(c.semestreInicio,(k+1)*step)<=date)k++}
+  else{while(addMonths(c.semestreInicio,k*step)>date)k--}
+  return k;
+}
+function periodOf(team,date){ // '06x18' ou '18x06' para a equipe naquela data
+  const c=S.cfg;const pair=PAIRS.CD.includes(team)?'CD':'AB';
+  const base=pair==='CD'?c.diurnoCD:c.diurnoAB;
+  const swapped=Math.abs(semestreIndex(date))%2===1;
+  const diurno=swapped?PAIRS[pair].find(t=>t!==base):base;
+  return team===diurno?'06x18':'18x06';
+}
+function shiftOn(date){
+  const c=S.cfg;const n=diff(c.refDate,date);const m=((n%4)+4)%4;
+  const pair=m<2?c.refDupla:otherPair(c.refDupla);
+  const [a,b]=PAIRS[pair];
+  const dia=periodOf(a,date)==='06x18'?a:b;const noite=dia===a?b:a;
+  return {pair,dia,noite,diaCiclo:(m%2)+1};
+}
+function nextSwap(date){const k=semestreIndex(date);return addMonths(S.cfg.semestreInicio,(k+1)*Math.max(1,+S.cfg.mesesTroca||6))}
+
+/* ===================== Ausências ===================== */
+const ferFim=f=>addDays(f.inicio,(+f.dias||1)-1);
+const afaFim=a=>a.fim||addDays(a.inicio,(+a.dias||1)-1);
+function absenceOf(fid,date){
+  const e=S.func[fid];if(e&&e.situacao==='Afastado')return{tipo:'Afastado',cls:'bad'};
+  for(const f of Object.values(S.fer))if(f.funcionarioId===fid&&f.inicio<=date&&date<=ferFim(f))return{tipo:'Férias',cls:'info',ate:ferFim(f)};
+  for(const a of Object.values(S.afa))if(a.funcionarioId===fid&&a.inicio<=date&&date<=afaFim(a))return{tipo:a.tipo||'Atestado',cls:'warn',ate:afaFim(a)};
+  return null;
+}
+const ativos=()=>Object.entries(S.func).filter(([,e])=>e.situacao==='Ativo'||e.situacao==='Afastado');
+function teamMembers(team){return ativos().filter(([,e])=>e.equipe===team).sort((a,b)=>a[1].nome.localeCompare(b[1].nome))}
+function teamStatus(team,date){
+  const mem=teamMembers(team);const out=[],inn=[];
+  mem.forEach(([id,e])=>{const ab=absenceOf(id,date);(ab?out:inn).push({id,e,ab})});
+  return{total:mem.length,inn,out};
+}
+
+/* ===================== Férias: período aquisitivo ===================== */
+function periodos(fid){
+  const e=S.func[fid];const base=e&&(e.inicioAquisitivo||e.admissao);if(!validISO(base))return[];
+  const hoje=todayISO();const out=[];
+  for(let k=0;k<40;k++){
+    const ini=addYears(base,k);if(ini>addYears(hoje,1))break;
+    const fim=addDays(addYears(ini,1),-1);const limite=addDays(fim,+S.cfg.limiteDias||305);
+    const recs=Object.entries(S.fer).filter(([,f])=>f.funcionarioId===fid&&f.periodoInicio===ini);
+    out.push({k,ini,fim,limite,recs,dias:recs.reduce((s,[,f])=>s+(+f.dias||0),0)});
+  }
+  return out;
+}
+function urg(limite){
+  const d=diff(todayISO(),limite);
+  if(d<0)return{t:'Vencido',cls:'bad',d};
+  if(d<90)return{t:'Atrasado',cls:'bad',d};
+  if(d<=180)return{t:'Atenção',cls:'warn',d};
+  return{t:'No prazo',cls:'ok',d};
+}
+function ferSituacao(fid){
+  const hoje=todayISO();const ps=periodos(fid);
+  const pend=ps.find(p=>p.recs.length===0&&p.ini<=hoje);
+  const prox=Object.entries(S.fer).filter(([,f])=>f.funcionarioId===fid&&ferFim(f)>=hoje).sort((a,b)=>a[1].inicio.localeCompare(b[1].inicio))[0];
+  return{ps,pend,prox,u:pend?urg(pend.limite):null};
+}
+
+/* ===================== Exportação ===================== */
+async function saveFile(name,data){
+  try{if(window.claude&&window.claude.use){const dl=await window.claude.use('downloads');if(dl){await dl.save({filename:name,data});return}}}catch(e){if(e&&e.code&&e.code!=='unavailable'){return}}
+  const blob=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function xlsx(name,sheets){
+  if(!window.XLSX){toast('Biblioteca de Excel não carregou');return}
+  const wb=XLSX.utils.book_new();sheets.forEach(([n,rows])=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=rows[0].map((_,i)=>({wch:Math.min(42,Math.max(10,...rows.map(r=>String(r[i]??'').length+2)))}));XLSX.utils.book_append_sheet(wb,ws,n)});
+  saveFile(name,XLSX.write(wb,{bookType:'xlsx',type:'array'}));
+}
+function exportEquipes(){
+  const rows=[['Equipe','Funcionário','Matrícula','Função','Situação','Turno no semestre','Admissão','Observação']];
+  Object.values(S.func).sort((a,b)=>(a.equipe||'z').localeCompare(b.equipe||'z')||a.nome.localeCompare(b.nome)).forEach(e=>rows.push([e.equipe||'Sem equipe',e.nome,e.matricula,e.setor,e.situacao,e.equipe?periodOf(e.equipe,todayISO()):'',fmt(e.admissao),e.obs||'']));
+  xlsx(`Equipes_Gate_${todayISO()}.xlsx`,[['Equipes',rows]]);
+}
+function exportEscala(){
+  const [y,m]=S.month.split('-').map(Number);const days=new Date(Date.UTC(y,m,0)).getUTCDate();
+  const r1=[['Data','Dia','Ciclo','06x18','Disponíveis','Ausentes 06x18','18x06','Disponíveis','Ausentes 18x06']];
+  for(let d=1;d<=days;d++){const ds=`${S.month}-${pad(d)}`;const sh=shiftOn(ds);const a=teamStatus(sh.dia,ds),b=teamStatus(sh.noite,ds);
+    r1.push([fmt(ds),DIAS[wd(ds)],sh.diaCiclo+'º dia',sh.dia,`${a.inn.length}/${a.total}`,a.out.map(x=>titleCase(x.e.nome)+' ('+x.ab.tipo+')').join(', '),sh.noite,`${b.inn.length}/${b.total}`,b.out.map(x=>titleCase(x.e.nome)+' ('+x.ab.tipo+')').join(', ')])}
+  const r2=[['Funcionário','Equipe',...Array.from({length:days},(_,i)=>String(i+1))]];
+  TEAMS.forEach(t=>teamMembers(t).forEach(([id,e])=>{r2.push([e.nome,t,...Array.from({length:days},(_,i)=>{const ds=`${S.month}-${pad(i+1)}`;const sh=shiftOn(ds);const ab=absenceOf(id,ds);
+    if(sh.dia!==t&&sh.noite!==t)return 'F';if(ab)return ab.tipo==='Férias'?'FER':ab.tipo==='Afastado'?'AF':'AT';return sh.dia===t?'D':'N'})])}));
+  r2.push([],['Legenda: D = 06x18, N = 18x06, F = folga, FER = férias, AT = atestado, AF = afastado']);
+  xlsx(`Escala_Gate_${S.month}.xlsx`,[['Resumo',r1],['Por funcionário',r2]]);
+}
+function exportFerias(){
+  const rows=[['Equipe','Funcionário','Matrícula','Admissão','Início aquisitivo','Fim aquisitivo','Limite','Início gozo','Fim gozo','Dias','Situação do período','Observação']];
+  Object.entries(S.func).filter(([,e])=>e.situacao==='Ativo'||e.situacao==='Afastado').sort((a,b)=>(a[1].equipe||'z').localeCompare(b[1].equipe||'z')||a[1].nome.localeCompare(b[1].nome)).forEach(([id,e])=>{
+    const ps=periodos(id);if(!ps.length){rows.push([e.equipe,e.nome,e.matricula,'','','','','','','','Sem data de admissão',''])}
+    ps.forEach(p=>{if(p.recs.length)p.recs.forEach(([,f])=>rows.push([e.equipe,e.nome,e.matricula,fmt(e.admissao),fmt(p.ini),fmt(p.fim),fmt(p.limite),fmt(f.inicio),fmt(ferFim(f)),f.dias,'Marcada',f.obs||'']));
+      else if(p.ini<=todayISO())rows.push([e.equipe,e.nome,e.matricula,fmt(e.admissao),fmt(p.ini),fmt(p.fim),fmt(p.limite),'','','',urg(p.limite).t,''])})});
+  xlsx(`Ferias_Gate_${todayISO()}.xlsx`,[['Férias',rows]]);
+}
+function exportAfast(){
+  const rows=[['Funcionário','Matrícula','Equipe','Tipo','Início','Fim','Dias','Documento entregue','Observação']];
+  Object.values(S.afa).sort((a,b)=>b.inicio.localeCompare(a.inicio)).forEach(a=>{const e=S.func[a.funcionarioId]||{};rows.push([e.nome||'',e.matricula||'',e.equipe||'',a.tipo,fmt(a.inicio),fmt(afaFim(a)),diff(a.inicio,afaFim(a))+1,a.docEntregue?'Sim':'Não',a.obs||''])});
+  xlsx(`Atestados_Gate_${todayISO()}.xlsx`,[['Atestados',rows]]);
+}
+function backupJSON(){saveFile(`backup_time_gate_${todayISO()}.json`,JSON.stringify({versao:1,gerado:new Date().toISOString(),funcionarios:S.func,ferias:S.fer,afastamentos:S.afa,config:S.cfg},null,1))}
+async function restoreJSON(file){
+  if(!file)return;let j;try{j=JSON.parse(await file.text())}catch(e){toast('Arquivo inválido');return}
+  if(!j.funcionarios){toast('Arquivo não é um backup desta aplicação');return}
+  if(!confirm(`Restaurar ${Object.keys(j.funcionarios).length} funcionários, ${Object.keys(j.ferias||{}).length} férias e ${Object.keys(j.afastamentos||{}).length} afastamentos? Registros com o mesmo código serão substituídos.`))return;
+  for(const [k,v] of Object.entries(j.funcionarios))await Store.put('func',k,v);
+  for(const [k,v] of Object.entries(j.ferias||{}))await Store.put('fer',k,v);
+  for(const [k,v] of Object.entries(j.afastamentos||{}))await Store.put('afa',k,v);
+  if(j.config)await Store.putCfg({...S.cfg,...j.config});toast('Backup restaurado');
+}
+
+/* ===================== Interface ===================== */
+const DIASL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const TITLES={escala:'Escala operacional',equipes:'Equipes',ferias:'Férias',afast:'Atestados e afastamentos'};
+const mono=(t,lg)=>t?`<span class="mono ${t} ${lg?'lg':''}" aria-hidden="true">${t[0]}</span>`:`<span class="mono ${lg?'lg':''}" aria-hidden="true">-</span>`;
+const nm=e=>esc(titleCase(e.nome));
+const plural=(n,s,p)=>`${n} ${n===1?s:(p||s+'s')}`;
+const shortTipo=t=>({'Afastamento INSS':'INSS','Atestado médico':'Atestado','Atestado odontológico':'Atestado','Declaração de comparecimento':'Declaração','Acompanhamento de familiar':'Acompanhamento','Acidente de trabalho':'Acidente','Licença maternidade':'Licença','Licença paternidade':'Licença','Licença nojo':'Licença'}[t]||t);
+function pillFor(ab){if(!ab)return'';const cls=ab.tipo==='Férias'?'hue':ab.tipo==='Afastado'?'neg':'warn';return `<span class="pill ${cls}" title="${esc(ab.tipo)}">${esc(shortTipo(ab.tipo))}${ab.ate?' até '+fmtS(ab.ate):''}</span>`}
+
+/* Barra lateral: quem está no gate agora */
+function renderSide(){
+  const d=todayISO();const sh=shiftOn(d);
+  const line=(t,per)=>{const st=teamStatus(t,d);return `<div class="nowrow">${mono(t)}<div>${t}<small>${per}</small></div><div class="num">${st.inn.length}<span>/${st.total}</span></div></div>`};
+  document.getElementById('nowBox').innerHTML=line(sh.dia,'06x18')+line(sh.noite,'18x06')+`<div class="nownote">${sh.diaCiclo}º dia do ciclo. Troca de turno em ${fmt(nextSwap(d))}.</div>`;
+  document.getElementById('mwho').innerHTML=`${mono(sh.dia)}${mono(sh.noite)}`;
+  document.getElementById('mtitle').textContent=TITLES[S.tab];
+  document.querySelectorAll('#nav button').forEach(b=>{b.setAttribute('aria-current',b.dataset.tab===S.tab?'page':'false')});
+  const late=ativos().filter(([id,e])=>e.situacao==='Ativo'&&(()=>{const u=ferSituacao(id).u;return u&&(u.t==='Vencido'||u.t==='Atrasado')})()).length;
+  const fb=document.querySelector('#nav [data-tab="ferias"]');fb.querySelector('.badge')?.remove();
+  if(late)fb.insertAdjacentHTML('beforeend',`<span class="badge" title="${plural(late,'período vencido ou atrasado','períodos vencidos ou atrasados')}">${late}</span>`);
+}
+
+/* ===================== Escala operacional ===================== */
+function viewEscala(main){
+  const c=S.cfg;const [y,m]=S.month.split('-').map(Number);const first=`${S.month}-01`;
+  const days=new Date(Date.UTC(y,m,0)).getUTCDate();const hoje=todayISO();const minT=+c.minTurno||0;
+  const sh=shiftOn(hoje);const a=teamStatus(sh.dia,hoje),b=teamStatus(sh.noite,hoje);
+  const step=Math.max(1,+c.mesesTroca||6);const ns=nextSwap(hoje);
+  const nextPair=(()=>{for(let i=1;i<5;i++){const x=addDays(hoje,i);const s=shiftOn(x);if(s.pair!==sh.pair)return{x,s}}})();
+  // achado: dias do mês abaixo do mínimo
+  const short=[];if(minT)for(let dd=1;dd<=days;dd++){const ds=`${S.month}-${pad(dd)}`;const s=shiftOn(ds);[[s.dia,'06x18'],[s.noite,'18x06']].forEach(([t,p])=>{if(teamStatus(t,ds).inn.length<minT)short.push(`${fmtS(ds)} ${t} ${p}`)})}
+  const finding=minT
+    ? (short.length?`<b>${plural(short.length,'turno abaixo','turnos abaixo')} do mínimo de ${minT}</b> em ${MESES[m-1]}: ${esc(short.slice(0,4).join(', '))}${short.length>4?' e outros':''}.`:`Nenhum turno abaixo do mínimo de ${minT} pessoas em ${MESES[m-1]}.`)
+    : `Hoje ${sh.dia} cobre o 06x18 com ${a.inn.length} de ${a.total} e ${sh.noite} o 18x06 com ${b.inn.length} de ${b.total}. Defina um mínimo por turno para ver os dias descobertos.`;
+  const outTxt=st=>st.out.length?st.out.map(x=>`${esc(titleCase(x.e.nome).split(' ')[0])} (${esc(x.ab.tipo.toLowerCase())})`).join(', '):'Ninguém ausente';
+
+  // folha do mês: equipe por dia
+  let head='<th class="tcol" scope="col"></th>';
+  for(let dd=1;dd<=days;dd++){const ds=`${S.month}-${pad(dd)}`;const w=wd(ds);
+    const swap=ds===addMonths(c.semestreInicio,semestreIndex(ds)*step)&&ds!==first?'swap':'';
+    head+=`<th scope="col" data-day="${ds}" class="${w===0||w===6?'we':''} ${ds===hoje?'today':''} ${ds===S.selDay?'sel':''} ${swap}" title="${fmt(ds)}${swap?', troca de turno':''}">${DIAS[w]}<b>${dd}</b></th>`}
+  const rows=TEAMS.map(t=>{const tot=teamMembers(t).length;let r=`<tr><td class="tcol"><div class="tname">${mono(t)}<span>${t}</span><small>${tot}</small></div></td>`;
+    for(let dd=1;dd<=days;dd++){const ds=`${S.month}-${pad(dd)}`;const s=shiftOn(ds);const w=wd(ds);
+      if(s.dia!==t&&s.noite!==t){r+=`<td><span class="c off ${w===0||w===6?'we':''}"></span></td>`;continue}
+      const st=teamStatus(t,ds);const per=s.dia===t?'06x18':'18x06';const low=minT&&st.inn.length<minT;const tight=minT&&st.inn.length===minT;
+      const tip=`${t} ${per} em ${fmt(ds)}: ${st.inn.length} de ${st.total}${minT?', mínimo '+minT:''}${st.out.length?'. Fora: '+st.out.map(x=>titleCase(x.e.nome)+' ('+x.ab.tipo+')').join(', '):''}`;
+      r+=`<td><button class="c ${per==='06x18'?'d':'n'} ${low?'low':''} ${tight?'tight':''} ${ds===S.selDay?'colsel':''}" data-day="${ds}" title="${esc(tip)}" aria-label="${esc(tip)}">${st.inn.length}</button></td>`}
+    return r+'</tr>'}).join('');
+
+  const sel=S.selDay;const ss=shiftOn(sel);
+  const crewList=(t,per)=>{const st=teamStatus(t,sel);return `<div><div class="dh">${mono(t)}<b>${t} ${per}</b><span>${st.inn.length} de ${st.total} disponíveis</span></div>
+    <ul class="people">${st.inn.map(x=>`<li>${nm(x.e)}${x.e.setor==='Focal Gate'?'<span class="pill">Focal</span>':''}</li>`).join('')}${st.out.map(x=>`<li class="out">${nm(x.e)}${pillFor(x.ab)}</li>`).join('')}</ul></div>`};
+
+  main.innerHTML=`
+   <div class="titlerow"><div class="t"><h1>Escala operacional</h1><p class="finding">${finding}</p></div>
+    <div class="tools"><div class="seg"><button id="prev" aria-label="Mês anterior"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 2.5L4.5 7 9 11.5"/></svg></button><span class="lbl">${MESES[m-1]} ${y}</span><button id="next" aria-label="Próximo mês"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 2.5L9.5 7 5 11.5"/></svg></button></div>
+     <button class="btn" id="hoje">Hoje</button><button class="btn" id="expEsc">Exportar mês</button></div></div>
+   ${!c.confirmado?`<div class="notice"><span>Os parâmetros da escala ainda são valores de exemplo. Confirme a data de referência do ciclo e a última troca de turno em <a href="#parametros" style="color:inherit;font-weight:600">Parâmetros da escala</a>.</span></div>`:''}
+   <div class="stack">
+    <section class="panel nowpanel" aria-label="Hoje">
+     <div><div class="shiftlbl">Diurno 06x18, hoje</div><div class="shiftteam">${mono(sh.dia,1)}<b>${sh.dia}</b><span class="shiftfig num">${a.inn.length}<small>/${a.total}</small></span></div><div class="shiftout">${outTxt(a)}</div></div>
+     <div><div class="shiftlbl">Noturno 18x06, a partir das 18h</div><div class="shiftteam">${mono(sh.noite,1)}<b>${sh.noite}</b><span class="shiftfig num">${b.inn.length}<small>/${b.total}</small></span></div><div class="shiftout">${outTxt(b)}</div></div>
+     <div class="cyc"><span class="k">Ciclo 2x2</span><span>${sh.diaCiclo}º dia de ${PAIRS[sh.pair].join(' e ')}</span><span>${nextPair?`${PAIRS[nextPair.s.pair].join(' e ')} entram em ${fmtS(nextPair.x)}`:''}</span><span class="k" style="margin-top:6px">Troca de turno</span><span>${fmt(ns)}, em ${diff(hoje,ns)} dias</span></div>
+    </section>
+    <section class="panel" aria-label="Escala do mês">
+     <div class="ph"><h2>Disponíveis por equipe e dia</h2><div class="legend"><span><i class="lg-d"></i>06x18</span><span><i class="lg-n"></i>18x06</span>${minT?`<span><i class="lg-tight"></i>No mínimo de ${minT}</span><span><i class="lg-low"></i>Abaixo do mínimo</span>`:''}<span><i class="lg-sw"></i>Troca de turno</span></div></div>
+     <div class="sheetwrap"><table class="sheet"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+     <div class="daydetail"><div style="grid-column:1/-1;padding-bottom:0"><h2 style="font-size:16px;line-height:22px">${DIASL[wd(sel)].replace(/^./,x=>x.toUpperCase())}, ${fmt(sel)}</h2><p class="finding" style="font-size:14px;margin:2px 0 0">${ss.diaCiclo}º dia do ciclo. Clique em outro dia da folha para ver quem trabalha.</p></div>${crewList(ss.dia,'06x18')}${crewList(ss.noite,'18x06')}</div>
+    </section>
+   </div>
+   <form class="settings" id="cfgForm"><div id="parametros"><h2>Parâmetros da escala</h2><p>Charlie e Delta trabalham nos mesmos dias, Alpha e Bravo nos outros dois. A cada troca, as equipes de cada dupla invertem o turno.</p><p>O backup guarda funcionários, férias, atestados e estes parâmetros em um arquivo JSON.</p></div>
+    <div class="panel" style="padding:20px"><div class="fgrid">
+     <label class="field">Data de referência do ciclo<input class="input" type="date" name="refDate" value="${c.refDate}"><span class="hint">Um dia que foi o 1º dia de trabalho de uma dupla</span></label>
+     <label class="field">Dupla que começou nessa data<select class="input" name="refDupla"><option value="CD" ${c.refDupla==='CD'?'selected':''}>Charlie e Delta</option><option value="AB" ${c.refDupla==='AB'?'selected':''}>Alpha e Bravo</option></select></label>
+     <label class="field">Última troca de turno<input class="input" type="date" name="semestreInicio" value="${c.semestreInicio}"></label>
+     <label class="field">Meses entre trocas<input class="input" type="number" min="1" name="mesesTroca" value="${c.mesesTroca}"></label>
+     <label class="field">06x18 de Charlie e Delta desde a troca<select class="input" name="diurnoCD"><option ${c.diurnoCD==='Charlie'?'selected':''}>Charlie</option><option ${c.diurnoCD==='Delta'?'selected':''}>Delta</option></select></label>
+     <label class="field">06x18 de Alpha e Bravo desde a troca<select class="input" name="diurnoAB"><option ${c.diurnoAB==='Alpha'?'selected':''}>Alpha</option><option ${c.diurnoAB==='Bravo'?'selected':''}>Bravo</option></select></label>
+     <label class="field">Mínimo de pessoas por turno<input class="input" type="number" min="0" name="minTurno" value="${c.minTurno}"><span class="hint">0 desliga o alerta</span></label>
+     <label class="field">Máximo em férias ao mesmo tempo por equipe<input class="input" type="number" min="1" name="maxFeriasEquipe" value="${c.maxFeriasEquipe}"></label>
+     <label class="field">Dias após o fim do aquisitivo para o limite<input class="input" type="number" min="1" name="limiteDias" value="${c.limiteDias}"><span class="hint">A planilha oficial usa 305</span></label>
+    </div>
+    <div class="formfoot"><span class="left" style="display:flex;gap:4px"><button class="btn quiet" type="button" id="bk">Baixar backup</button><label class="btn quiet">Restaurar backup<input type="file" accept=".json" id="rs" hidden></label></span><button class="btn primary">Salvar parâmetros</button></div></div>
+   </form>`;
+  main.querySelector('#prev').onclick=()=>{S.month=addMonths(first,-1).slice(0,7);renderTab()};
+  main.querySelector('#next').onclick=()=>{S.month=addMonths(first,1).slice(0,7);renderTab()};
+  main.querySelector('#hoje').onclick=()=>{S.month=hoje.slice(0,7);S.selDay=hoje;renderTab()};
+  main.querySelector('#expEsc').onclick=exportEscala;
+  main.querySelectorAll('[data-day]').forEach(el=>el.onclick=()=>{S.selDay=el.dataset.day;renderTab()});
+  main.querySelector('#cfgForm').onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+    if(!validISO(f.refDate)||!validISO(f.semestreInicio)){toast('Preencha as duas datas');return}
+    ['mesesTroca','minTurno','maxFeriasEquipe','limiteDias'].forEach(k=>f[k]=+f[k]||0);
+    Store.putCfg({...S.cfg,...f,confirmado:true});toast('Parâmetros salvos')};
+  main.querySelector('#bk').onclick=backupJSON;
+  const sw=main.querySelector('.sheetwrap'),th=main.querySelector('.sheet thead th.sel')||main.querySelector('.sheet thead th.today');if(sw&&th&&sw.scrollWidth>sw.clientWidth)sw.scrollLeft=Math.max(0,th.offsetLeft-sw.clientWidth/2);
+  main.querySelector('#rs').onchange=e=>restoreJSON(e.target.files[0]);
+}
+
+/* ===================== Equipes ===================== */
+function dupMats(){const c={};Object.values(S.func).forEach(e=>{if(e.matricula)c[e.matricula]=(c[e.matricula]||0)+1});return c}
+function rowHTML(id,e,dups,move=true){
+  const ab=absenceOf(id,todayISO());
+  const flag=e.matricula&&dups[e.matricula]>1?'<span class="pill neg">Matrícula repetida</span>':!e.matricula?'<span class="pill">Sem matrícula</span>':'';
+  const opts=['',...TEAMS].map(t=>`<option value="${t}" ${e.equipe===t?'selected':''}>${t||'Sem equipe'}</option>`).join('');
+  return `<li class="row" draggable="${move}" data-id="${esc(id)}">
+    <div class="nm">${nm(e)}</div>
+    <div class="meta">${e.matricula?esc(e.matricula):'<span class="dash">-</span>'}${e.setor==='Focal Gate'?', <span class="focal">Focal Gate</span>':''}${pillFor(ab)||flag}${move?'':`<span class="pill">${esc(e.situacao)}</span>`}</div>
+    ${move?`<select aria-label="Mover ${esc(e.nome)} para equipe" data-move="${esc(id)}">${opts}</select>`:''}</li>`;
+}
+function viewEquipes(main){
+  const d=todayISO();const sh=shiftOn(d);const dups=dupMats();const q=S.q.trim().toUpperCase();
+  const match=e=>!q||e.nome.includes(q)||(e.matricula||'').includes(q);
+  const sortFn=(a,b)=>(a[1].setor==='Focal Gate'?-1:0)-(b[1].setor==='Focal Gate'?-1:0)||a[1].nome.localeCompare(b[1].nome);
+  const act=ativos();const sem=act.filter(([,e])=>!e.equipe);const semMat=act.filter(([,e])=>!e.matricula).length;
+  const dupN=Object.values(dups).filter(n=>n>1).length;
+  const inTeams=act.filter(([,e])=>e.equipe).length;
+  const issues=[sem.length?plural(sem.length,'pessoa sem equipe','pessoas sem equipe'):'',semMat?plural(semMat,'sem matrícula','sem matrícula'):'',dupN?plural(dupN,'matrícula repetida','matrículas repetidas'):''].filter(Boolean);
+  const crews=TEAMS.map(t=>{
+    const list=act.filter(([,e])=>e.equipe===t&&match(e)).sort(sortFn);const all=teamMembers(t).length;
+    const working=sh.dia===t||sh.noite===t;const st=teamStatus(t,d);
+    return `<section class="panel crew" data-team="${t}" aria-label="Equipe ${t}">
+      <div class="crewh">${mono(t,1)}<h2>${t}</h2><span class="num">${all}</span></div>
+      <div class="crewmeta">${periodOf(t,d)} até ${fmt(addDays(nextSwap(d),-1))}<br>${working?`<b>Em serviço hoje</b>, ${st.inn.length} disponíveis`:'De folga hoje'}${st.out.length?`, ${plural(st.out.length,'ausente','ausentes')}`:''}</div>
+      <ul class="rows">${list.map(([id,e])=>rowHTML(id,e,dups)).join('')||`<li class="emptyrow">${q?'Ninguém com esse nome nesta equipe.':'Arraste funcionários para cá.'}</li>`}</ul></section>`}).join('');
+  const semList=sem.filter(([,e])=>match(e)).sort(sortFn);
+  const inat=Object.entries(S.func).filter(([,e])=>!['Ativo','Afastado'].includes(e.situacao)&&match(e));
+  main.innerHTML=`
+   <div class="titlerow"><div class="t"><h1>Equipes</h1><p class="finding">${inTeams} pessoas em 4 equipes.${issues.length?` <b>Para revisar: ${issues.join(', ')}.</b>`:''}</p></div>
+    <div class="tools"><input class="input grow" type="search" id="q" placeholder="Buscar nome ou matrícula" value="${esc(S.q)}" style="width:240px">
+     <button class="btn" id="expEq">Exportar</button><button class="btn primary" id="addEmp">Novo funcionário</button></div></div>
+   <div class="stack">
+   ${semList.length?`<section class="panel unassigned" data-team="" aria-label="Sem equipe"><div class="ph"><h2>Sem equipe</h2><span class="sub">Arraste para uma equipe ou use Mover. Constam só na planilha de férias.</span></div><ul class="rows">${semList.map(([id,e])=>rowHTML(id,e,dups)).join('')}</ul></section>`:''}
+   <div class="board">${crews}</div>
+   </div>
+   <details class="panel inactive"><summary>Desligados e promovidos (${inat.length})</summary><ul class="rows">${inat.map(([id,e])=>rowHTML(id,e,dups,false)).join('')||'<li class="emptyrow">Nenhum</li>'}</ul></details>`;
+  const qi=main.querySelector('#q');qi.oninput=()=>{S.q=qi.value;const pos=qi.selectionStart;renderTab();const n=document.getElementById('q');n.focus();n.setSelectionRange(pos,pos)};
+  main.querySelector('#addEmp').onclick=()=>empDialog();
+  main.querySelector('#expEq').onclick=exportEquipes;
+  main.querySelectorAll('select[data-move]').forEach(s=>{s.onclick=e=>e.stopPropagation();s.onchange=()=>moveEmp(s.dataset.move,s.value)});
+  main.querySelectorAll('.row[data-id]').forEach(c=>{
+    c.onclick=e=>{if(e.target.tagName!=='SELECT')empDialog(c.dataset.id)};
+    c.ondragstart=e=>{e.dataTransfer.setData('text/plain',c.dataset.id);c.classList.add('dragging')};
+    c.ondragend=()=>c.classList.remove('dragging');
+  });
+  main.querySelectorAll('[data-team]').forEach(col=>{
+    col.ondragover=e=>{e.preventDefault();col.classList.add('drop')};
+    col.ondragleave=e=>{if(!col.contains(e.relatedTarget))col.classList.remove('drop')};
+    col.ondrop=e=>{e.preventDefault();col.classList.remove('drop');moveEmp(e.dataTransfer.getData('text/plain'),col.dataset.team)};
+  });
+}
+function moveEmp(id,team){const e=S.func[id];if(!e||e.equipe===team)return;Store.put('func',id,{...e,equipe:team});toast(`${titleCase(e.nome)} agora em ${team||'Sem equipe'}`)}
+
+function empDialog(id){
+  const e=id?S.func[id]:{nome:'',matricula:'',setor:'Gate',equipe:'',situacao:'Ativo',admissao:'',inicioAquisitivo:'',obs:''};
+  openDlg(`<h3>${id?nm(e):'Novo funcionário'}</h3>
+   <div class="fgrid">
+    <label class="field full">Nome completo<input class="input" name="nome" required value="${esc(e.nome)}"></label>
+    <label class="field">Matrícula<input class="input" name="matricula" inputmode="numeric" value="${esc(e.matricula)}"></label>
+    <label class="field">Função<select class="input" name="setor"><option ${e.setor==='Gate'?'selected':''}>Gate</option><option ${e.setor==='Focal Gate'?'selected':''}>Focal Gate</option></select></label>
+    <label class="field">Equipe<select class="input" name="equipe">${['',...TEAMS].map(t=>`<option value="${t}" ${e.equipe===t?'selected':''}>${t||'Sem equipe'}</option>`).join('')}</select></label>
+    <label class="field">Situação<select class="input" name="situacao">${['Ativo','Afastado','Desligado','Promovido'].map(t=>`<option ${e.situacao===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="field">Admissão<input class="input" type="date" name="admissao" value="${esc(e.admissao)}"></label>
+    <label class="field">Início do período aquisitivo<input class="input" type="date" name="inicioAquisitivo" value="${esc(e.inicioAquisitivo)}"><span class="hint">Se vazio, usa a admissão</span></label>
+    <label class="field full">Observação<textarea class="input" name="obs" rows="2">${esc(e.obs)}</textarea></label>
+   </div>
+   <div class="formfoot">${id?'<button type="button" class="btn danger left" id="delEmp">Excluir funcionário</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
+  f=>{const nid=id||(f.matricula?'m'+f.matricula:uid('n-'));if(!id&&S.func[nid]){toast('Já existe funcionário com essa matrícula');return false}
+     Store.put('func',nid,{...e,...f,nome:f.nome.trim().toUpperCase()});toast('Funcionário salvo');});
+  if(id)document.getElementById('delEmp').onclick=()=>{
+    const nF=Object.values(S.fer).filter(x=>x.funcionarioId===id).length+Object.values(S.afa).filter(x=>x.funcionarioId===id).length;
+    if(confirm(`Excluir ${e.nome}?${nF?`\nOs ${nF} registros de férias e afastamentos dele também serão excluídos.`:''}\nPara manter o histórico, prefira mudar a situação para Desligado.`)){
+      Object.entries(S.fer).forEach(([k,x])=>{if(x.funcionarioId===id)Store.del('fer',k)});
+      Object.entries(S.afa).forEach(([k,x])=>{if(x.funcionarioId===id)Store.del('afa',k)});
+      Store.del('func',id);closeDlg();toast('Funcionário excluído')}};
+}
+
+/* ===================== Férias ===================== */
+function viewFerias(main){
+  const hoje=todayISO();
+  const rows=ativos().filter(([,e])=>e.situacao==='Ativo').map(([id,e])=>({id,e,...ferSituacao(id)}));
+  const emGozo=rows.filter(r=>r.prox&&r.prox[1].inicio<=hoje).length;
+  const prox90=Object.values(S.fer).filter(f=>f.inicio>hoje&&f.inicio<=addDays(hoje,90)).length;
+  const cnt=t=>rows.filter(r=>r.u&&r.u.t===t).length;
+  const late=rows.filter(r=>r.u&&(r.u.t==='Vencido'||r.u.t==='Atrasado'));
+  let list=rows;
+  if(S.ferTeam)list=list.filter(r=>(r.e.equipe||'')===(S.ferTeam==='-'?'':S.ferTeam));
+  if(S.ferStatus==='Marcada')list=list.filter(r=>r.prox);
+  else if(S.ferStatus==='Sem data')list=list.filter(r=>!r.ps.length);
+  else if(S.ferStatus)list=list.filter(r=>r.u&&r.u.t===S.ferStatus);
+  const ord={Vencido:0,Atrasado:1,'Atenção':2,'No prazo':3};
+  list.sort((a,b)=>((a.u?ord[a.u.t]:9)-(b.u?ord[b.u.t]:9))||((a.pend?a.pend.limite:'9')>(b.pend?b.pend.limite:'9')?1:-1)||a.e.nome.localeCompare(b.e.nome));
+
+  const max=+S.cfg.maxFeriasEquipe||2;const conf=[];const confIds=new Set();
+  TEAMS.forEach(t=>{const mem=teamMembers(t).map(([id])=>id);const fs=Object.entries(S.fer).filter(([,f])=>mem.includes(f.funcionarioId)&&ferFim(f)>=hoje);
+    let run=null;for(let i=0;i<400;i++){const d=addDays(hoje,i);const on=fs.filter(([,f])=>f.inicio<=d&&d<=ferFim(f));const n=on.length;
+      if(n>max){on.forEach(([k])=>confIds.add(k));if(run&&run.n===n)run.fim=d;else{run&&conf.push(run);run={t,ini:d,fim:d,n}}}else if(run){conf.push(run);run=null}}
+    run&&conf.push(run)});
+
+  const finding=late.length?`<b>${plural(late.length,'pessoa','pessoas')} com período vencido ou a menos de 90 dias do limite</b> e sem férias marcadas: ${late.slice(0,3).map(r=>esc(titleCase(r.e.nome))).join(', ')}${late.length>3?' e outros':''}.`:'Nenhum período vencido ou a menos de 90 dias do limite.';
+
+  // linha do tempo: 12 meses, férias, atestados e afastados
+  const g0=`${hoje.slice(0,7)}-01`;const g1=addMonths(g0,12);const span=diff(g0,g1);
+  const pct=d=>Math.max(0,Math.min(100,diff(g0,d)/span*100));
+  const months=[];for(let i=0;i<12;i++){const a=addMonths(g0,i);months.push({l:MESES[+a.slice(5,7)-1].slice(0,3)+(i===0||a.slice(5,7)==='01'?' '+a.slice(0,4):''),w:diff(a,addMonths(a,1)),x:pct(a)})}
+  const mlines=months.slice(1).map(mm=>`<span class="tlmline" style="left:${mm.x}%"></span>`).join('');
+  const groups=[...TEAMS,''].map(t=>{const mem=ativos().filter(([,e])=>(e.equipe||'')===t&&(!S.ferTeam||(S.ferTeam==='-'?'':S.ferTeam)===t)).sort((a,b)=>a[1].nome.localeCompare(b[1].nome));if(!mem.length)return'';
+    return `<div class="tlgroup">${mono(t)}${t||'Sem equipe'}</div>`+mem.map(([id,e])=>{
+      const bar=(cls,ini,fim,label,title,attr)=>{const l=pct(ini),w=Math.max(.5,pct(addDays(fim,1))-l);return `<button class="bar ${cls}" ${attr} style="left:${l}%;width:${w}%" title="${esc(title)}" aria-label="${esc(title)}">${w>2.2?label:''}</button>`};
+      let bars=Object.entries(S.fer).filter(([,f])=>f.funcionarioId===id&&ferFim(f)>=g0&&f.inicio<g1).map(([fid,f])=>bar('fer'+(confIds.has(fid)?' conf':''),f.inicio,ferFim(f),f.dias+'d',`${titleCase(e.nome)}: férias de ${fmt(f.inicio)} a ${fmt(ferFim(f))}, ${f.dias} dias`,`data-fer="${fid}"`)).join('');
+      bars+=Object.entries(S.afa).filter(([,a])=>a.funcionarioId===id&&afaFim(a)>=g0&&a.inicio<g1).map(([aid,a])=>bar(/INSS|Licença/.test(a.tipo)?'afa':'ate',a.inicio,afaFim(a),'',`${titleCase(e.nome)}: ${a.tipo}, ${fmt(a.inicio)} a ${fmt(afaFim(a))}`,`data-afa="${aid}"`)).join('');
+      if(e.situacao==='Afastado')bars+=`<span class="bar afa" style="left:0;width:${pct(hoje)}%;cursor:default" title="Afastado">Afastado</span>`;
+      return `<div class="tlrow"><div class="tlname" title="${esc(e.nome)}">${nm(e)}</div><div class="tltrack">${mlines}${bars}</div></div>`}).join('')}).join('');
+
+  main.innerHTML=`
+   <div class="titlerow"><div class="t"><h1>Férias</h1><p class="finding">${finding}</p></div>
+    <div class="tools"><select class="input" id="fTeam" aria-label="Equipe"><option value="">Todas as equipes</option>${TEAMS.map(t=>`<option ${S.ferTeam===t?'selected':''}>${t}</option>`).join('')}<option value="-" ${S.ferTeam==='-'?'selected':''}>Sem equipe</option></select>
+     <select class="input" id="fSt" aria-label="Situação"><option value="">Todas as situações</option>${['Vencido','Atrasado','Atenção','No prazo','Marcada','Sem data'].map(t=>`<option ${S.ferStatus===t?'selected':''}>${t}</option>`).join('')}</select>
+     <button class="btn" id="expFer">Exportar</button><button class="btn primary" id="addFer">Marcar férias</button></div></div>
+   ${conf.length?`<div class="notice"><div><b>Mais de ${max} em férias ao mesmo tempo na mesma equipe</b><ul>${conf.slice(0,6).map(c=>`<li>${c.t}: ${c.n} pessoas de ${fmt(c.ini)} a ${fmt(c.fim)}</li>`).join('')}</ul></div></div>`:''}
+   <div class="stack">
+    <section class="panel strip" aria-label="Resumo">
+     <div><div class="l">Vencidos ou a menos de 90 dias do limite</div><div class="v num ${late.length?'neg':''}" style="text-align:left">${late.length}</div><div class="s">${cnt('Vencido')} vencidos, ${cnt('Atrasado')} atrasados</div></div>
+     <div><div class="l">Entre 180 e 90 dias do limite</div><div class="v num" style="text-align:left">${cnt('Atenção')}</div><div class="s">Marcar nos próximos meses</div></div>
+     <div><div class="l">Em férias hoje</div><div class="v num" style="text-align:left">${emGozo}</div><div class="s">de ${rows.length} ativos</div></div>
+     <div><div class="l">Saídas nos próximos 90 dias</div><div class="v num" style="text-align:left">${prox90}</div><div class="s">até ${fmt(addDays(hoje,90))}</div></div>
+    </section>
+    <section class="panel"><div class="ph"><h2>Período aquisitivo em aberto</h2><span class="sub">${plural(list.length,'pessoa','pessoas')}, mais urgentes primeiro</span></div>
+     <div class="tablewrap"><table class="data"><thead><tr><th>Funcionário</th><th>Equipe</th><th class="num">Período em aberto</th><th class="num">Limite</th><th>Prazo</th><th class="num">Próximas férias</th><th></th></tr></thead>
+     <tbody>${(S.ferAll?list:list.slice(0,12)).map(r=>{const p=r.pend;const pr=r.prox&&r.prox[1];
+      return `<tr><td class="two"><b>${nm(r.e)}</b><small>${esc(r.e.matricula||'Sem matrícula')}</small></td>
+      <td><span class="teamcell">${mono(r.e.equipe)}${esc(r.e.equipe||'Sem equipe')}</span></td>
+      <td class="num">${p?`${fmt(p.ini)} a ${fmt(p.fim)}`:(r.ps.length?'<span class="dash">-</span>':'<span class="pill">Sem admissão</span>')}</td>
+      <td class="num">${p?fmt(p.limite):'<span class="dash">-</span>'}</td>
+      <td>${r.u?`<span class="pill ${r.u.cls==='bad'?'neg':r.u.cls==='warn'?'warn':''}">${r.u.t}</span> <span class="dash" style="font-size:12px">${r.u.d<0?Math.abs(r.u.d)+' dias atrás':r.u.d+' dias'}</span>`:'<span class="dash">-</span>'}</td>
+      <td class="num two">${pr?`<b>${fmt(pr.inicio)} a ${fmt(ferFim(pr))}</b><small>${pr.inicio<=hoje?'Em gozo, ':''}${pr.dias} dias</small>`:'<span class="dash">-</span>'}</td>
+      <td class="num">${pr?`<button class="act" data-fer="${r.prox[0]}">Editar</button>`:`<button class="act" data-mark="${esc(r.id)}">Marcar</button>`}</td></tr>`}).join('')||'<tr><td colspan="7" class="emptystate">Ninguém nesta combinação de filtros.</td></tr>'}</tbody></table></div>${list.length>12?`<div style="padding:10px 20px 14px;border-top:1px solid var(--rule)"><button class="act" id="ferAll">${S.ferAll?'Mostrar só os 12 mais urgentes':'Ver todos os '+list.length}</button></div>`:''}</section>
+    <section class="panel"><div class="ph"><h2>Ausências nos próximos 12 meses</h2><div class="legend"><span><i class="lgfer"></i>Férias</span><span><i class="lgate"></i>Atestado</span><span><i class="lgafa"></i>Afastamento ou licença</span>${conf.length?'<span><i class="lgfer lgconf"></i>Acima do limite da equipe</span>':''}</div></div>
+     <div class="tl"><div class="tlin"><div class="tlhead"><div></div><div class="tlmonths" style="grid-template-columns:${months.map(mm=>mm.w+'fr').join(' ')}">${months.map(mm=>`<div>${mm.l}</div>`).join('')}</div></div>
+     <div style="position:relative">${groups}<span class="tltoday" style="left:calc(200px + (100% - 200px) * ${pct(hoje)/100})" title="Hoje"></span></div></div></div></section>
+   </div>`;
+  main.querySelector('#fTeam').onchange=e=>{S.ferTeam=e.target.value;renderTab()};
+  main.querySelector('#fSt').onchange=e=>{S.ferStatus=e.target.value;renderTab()};
+  main.querySelector('#addFer').onclick=()=>ferDialog();
+  const fa=main.querySelector('#ferAll');if(fa)fa.onclick=()=>{S.ferAll=!S.ferAll;renderTab()};
+  main.querySelector('#expFer').onclick=exportFerias;
+  main.querySelectorAll('[data-mark]').forEach(b=>b.onclick=()=>ferDialog(null,b.dataset.mark));
+  main.querySelectorAll('[data-fer]').forEach(b=>b.onclick=()=>ferDialog(b.dataset.fer));
+  main.querySelectorAll('[data-afa]').forEach(b=>b.onclick=()=>afDialog(b.dataset.afa));
+}
+function empOptions(sel,onlyActive=true){
+  return Object.entries(S.func).filter(([,e])=>!onlyActive||e.situacao!=='Desligado').sort((a,b)=>a[1].nome.localeCompare(b[1].nome))
+    .map(([id,e])=>`<option value="${esc(id)}" ${id===sel?'selected':''}>${nm(e)}${e.equipe?', '+e.equipe:''}</option>`).join('');
+}
+function ferDialog(fid,empId){
+  const f=fid?S.fer[fid]:{funcionarioId:empId||'',inicio:'',dias:30,periodoInicio:'',obs:''};
+  openDlg(`<h3>${fid?'Editar férias':'Marcar férias'}</h3>
+   <div class="fgrid">
+    <label class="field full">Funcionário<select class="input" name="funcionarioId" required><option value="">Selecione</option>${empOptions(f.funcionarioId)}</select></label>
+    <label class="field full">Período aquisitivo<select class="input" name="periodoInicio" id="perSel"></select></label>
+    <label class="field">Início do gozo<input class="input" type="date" name="inicio" required value="${esc(f.inicio)}"></label>
+    <label class="field">Dias<select class="input" name="dias">${[10,15,20,30,...[5,14,25].filter(x=>x===+f.dias)].map(d=>`<option ${+f.dias===d?'selected':''}>${d}</option>`).join('')}</select><span class="hint">20 dias quando há abono de 10</span></label>
+    <div class="field full" style="font-weight:400">Retorno previsto: <b id="ret" style="font-weight:600">-</b></div>
+    <label class="field full">Observação<textarea class="input" name="obs" rows="2">${esc(f.obs)}</textarea></label>
+   </div><div class="warnbox" id="fw"></div>
+   <div class="formfoot">${fid?'<button type="button" class="btn danger left" id="delF">Excluir férias</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
+  v=>{if(!v.funcionarioId||!validISO(v.inicio)){toast('Escolha o funcionário e a data de início');return false}
+     Store.put('fer',fid||uid('f'),{...f,...v,dias:+v.dias});toast('Férias salvas')});
+  const form=document.getElementById('dlgForm');
+  const upd=()=>{
+    const v=Object.fromEntries(new FormData(form));const ps=v.funcionarioId?periodos(v.funcionarioId):[];
+    const sel=document.getElementById('perSel');let cur=sel.value||f.periodoInicio;if(!ps.some(p=>p.ini===cur))cur='';
+    const def=cur||((ps.find(p=>p.recs.length===0)||ps[ps.length-1]||{}).ini)||'';
+    sel.innerHTML=ps.length?ps.map(p=>`<option value="${p.ini}" ${p.ini===def?'selected':''}>${fmt(p.ini)} a ${fmt(p.fim)}, limite ${fmt(p.limite)}${p.recs.filter(([k])=>k!==fid).length?', já tem férias':''}</option>`).join(''):'<option value="">Cadastre a admissão do funcionário</option>';
+    const w=[];if(validISO(v.inicio)){const fim=addDays(v.inicio,(+v.dias||1)-1);document.getElementById('ret').textContent=fmt(addDays(fim,1))+', último dia '+fmt(fim);
+      const p=ps.find(p=>p.ini===sel.value);if(p&&fim>p.limite)w.push(`Termina depois do limite de ${fmt(p.limite)}.`);
+      if(p&&v.inicio<=p.fim)w.push('Começa antes de completar o período aquisitivo.');
+      const e=S.func[v.funcionarioId];if(e&&e.equipe){const mem=teamMembers(e.equipe).map(([id])=>id).filter(x=>x!==v.funcionarioId);
+        let peak=0;for(let d=v.inicio;d<=fim;d=addDays(d,1)){const n=Object.entries(S.fer).filter(([k,x])=>k!==fid&&mem.includes(x.funcionarioId)&&x.inicio<=d&&d<=ferFim(x)).length;peak=Math.max(peak,n)}
+        if(peak+1>(+S.cfg.maxFeriasEquipe||2))w.push(`A equipe ${e.equipe} ficará com ${peak+1} pessoas em férias ao mesmo tempo.`)}
+      const ab=Object.values(S.afa).find(a=>a.funcionarioId===v.funcionarioId&&a.inicio<=fim&&afaFim(a)>=v.inicio);if(ab)w.push('Coincide com um atestado ou afastamento registrado.');
+    }else document.getElementById('ret').textContent='-';
+    document.getElementById('fw').innerHTML=w.map(esc).join('<br>');
+  };
+  form.oninput=upd;form.onchange=upd;upd();
+  if(fid)document.getElementById('delF').onclick=()=>{if(confirm('Excluir este registro de férias?')){Store.del('fer',fid);closeDlg();toast('Férias excluídas')}};
+}
+
+/* ===================== Atestados e afastamentos ===================== */
+const TIPOS=['Atestado médico','Atestado odontológico','Declaração de comparecimento','Acompanhamento de familiar','Acidente de trabalho','Afastamento INSS','Licença maternidade','Licença paternidade','Licença nojo','Outro'];
+function viewAfast(main){
+  const hoje=todayISO();const m0=`${S.afaMonth}-01`;const m1=addDays(addMonths(m0,1),-1);
+  const all=Object.entries(S.afa).map(([id,a])=>({id,a,e:S.func[a.funcionarioId]||{nome:'(removido)'},fim:afaFim(a)}));
+  const ov=(a,b,c,d)=>a<=d&&c<=b;
+  const daysIn=(x,a,b)=>{const s=x.a.inicio>a?x.a.inicio:a,e=x.fim<b?x.fim:b;return e>=s?diff(s,e)+1:0};
+  let list=all.filter(x=>ov(x.a.inicio,x.fim,m0,m1));
+  if(S.afaTeam)list=list.filter(x=>(x.e.equipe||'')===S.afaTeam);
+  if(S.afaTipo)list=list.filter(x=>x.a.tipo===S.afaTipo);
+  list.sort((a,b)=>b.a.inicio.localeCompare(a.a.inicio));
+  const hojeList=all.filter(x=>x.a.inicio<=hoje&&hoje<=x.fim);
+  const afastados=Object.values(S.func).filter(e=>e.situacao==='Afastado');
+  const monthAll=all.filter(x=>ov(x.a.inicio,x.fim,m0,m1));
+  const diasMes=monthAll.reduce((s,x)=>s+daysIn(x,m0,m1),0);
+  const pend=all.filter(x=>!x.a.docEntregue);
+  const d90=addDays(hoje,-89);
+  const byTeam=TEAMS.map(t=>{const xs=all.filter(x=>x.e.equipe===t&&ov(x.a.inicio,x.fim,d90,hoje));return{t,n:xs.length,d:xs.reduce((s,x)=>s+daysIn(x,d90,hoje),0)}}).sort((a,b)=>b.d-a.d);
+  const maxD=Math.max(1,...byTeam.map(b=>b.d));
+  const people={};all.filter(x=>ov(x.a.inicio,x.fim,d90,hoje)).forEach(x=>{const k=x.a.funcionarioId;people[k]=people[k]||{e:x.e,n:0,d:0};people[k].n++;people[k].d+=daysIn(x,d90,hoje)});
+  const top=Object.values(people).sort((a,b)=>b.n-a.n||b.d-a.d).slice(0,4);
+  const [y,m]=S.afaMonth.split('-').map(Number);
+  const finding=(hojeList.length+afastados.length)?`<b>${plural(hojeList.length+afastados.length,'pessoa fora','pessoas fora')} hoje</b>${hojeList.length?': '+hojeList.slice(0,3).map(x=>`${esc(titleCase(x.e.nome))} até ${fmtS(x.fim)}`).join(', '):''}${afastados.length?`${hojeList.length?', mais ':': '}${plural(afastados.length,'afastado','afastados')} sem data de retorno`:''}.${pend.length?` ${plural(pend.length,'documento pendente','documentos pendentes')} de entrega ao RH.`:''}`:`Ninguém fora por atestado hoje.${pend.length?` ${plural(pend.length,'documento pendente','documentos pendentes')} de entrega ao RH.`:''}`;
+  main.innerHTML=`
+   <div class="titlerow"><div class="t"><h1>Atestados e afastamentos</h1><p class="finding">${finding}</p></div>
+    <div class="tools"><div class="seg"><button id="mp" aria-label="Mês anterior"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 2.5L4.5 7 9 11.5"/></svg></button><span class="lbl">${MESES[m-1]} ${y}</span><button id="mn" aria-label="Próximo mês"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 2.5L9.5 7 5 11.5"/></svg></button></div>
+     <button class="btn" id="expAf">Exportar</button><button class="btn primary" id="addAf">Registrar atestado</button></div></div>
+   <div class="stack">
+    <section class="panel strip" aria-label="Resumo do mês">
+     <div><div class="l">Fora hoje</div><div class="v num" style="text-align:left">${hojeList.length+afastados.length}</div><div class="s">${hojeList.length} por atestado, ${afastados.length} afastados</div></div>
+     <div><div class="l">Registros em ${MESES[m-1]}</div><div class="v num" style="text-align:left">${monthAll.length}</div><div class="s">${monthAll.filter(x=>/Atestado/.test(x.a.tipo)).length} atestados</div></div>
+     <div><div class="l">Dias de ausência em ${MESES[m-1]}</div><div class="v num" style="text-align:left">${diasMes}<small> dias</small></div><div class="s">Somando todos os registros do mês</div></div>
+     <div><div class="l">Documento pendente</div><div class="v num ${pend.length?'neg':''}" style="text-align:left">${pend.length}</div><div class="s">Ainda não entregue ao RH</div></div>
+    </section>
+    <div class="cols2">
+     <section class="panel"><div class="ph"><h2>Dias de ausência por equipe</h2><span class="sub">Últimos 90 dias</span></div>
+      <ul class="barlist">${byTeam.map((bt,i)=>`<li><div class="top">${mono(bt.t)}${bt.t}<span class="num">${bt.d} dias<small>${plural(bt.n,'registro')}</small></span></div><div class="tr"><i class="${i===0&&bt.d?'hi':''}" style="width:${bt.d/maxD*100}%"></i></div></li>`).join('')}</ul></section>
+     <section class="panel"><div class="ph"><h2>Mais registros</h2><span class="sub">Últimos 90 dias</span></div>
+      ${top.length?`<ul class="barlist">${top.map(p=>`<li><div class="top">${mono(p.e.equipe)}${nm(p.e)}<span class="num">${plural(p.n,'registro')}<small>${p.d} dias</small></span></div></li>`).join('')}</ul>`:`<div class="emptystate" style="padding-top:4px">Nenhum atestado nos últimos 90 dias.</div>`}</section>
+    </div>
+    <section class="panel"><div class="ph"><h2>Registros de ${MESES[m-1]}</h2>
+      <select class="input" id="aT" aria-label="Equipe"><option value="">Todas as equipes</option>${TEAMS.map(t=>`<option ${S.afaTeam===t?'selected':''}>${t}</option>`).join('')}</select>
+      <select class="input" id="aTp" aria-label="Tipo"><option value="">Todos os tipos</option>${TIPOS.map(t=>`<option ${S.afaTipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+     <div class="tablewrap"><table class="data"><thead><tr><th>Funcionário</th><th>Equipe</th><th>Tipo</th><th class="num">Período</th><th class="num">Dias</th><th>Situação</th><th>Documento</th></tr></thead>
+     <tbody>${list.map(x=>{const st=x.fim<hoje?['Encerrado','']:x.a.inicio>hoje?['Futuro','hue']:['Em curso','warn'];
+      return `<tr class="click" data-af="${x.id}" tabindex="0"><td class="two"><b>${nm(x.e)}</b>${x.a.obs?`<small>${esc(x.a.obs)}</small>`:''}</td><td><span class="teamcell">${mono(x.e.equipe)}${esc(x.e.equipe||'Sem equipe')}</span></td><td>${esc(x.a.tipo)}</td><td class="num">${fmt(x.a.inicio)} a ${fmt(x.fim)}</td><td class="num">${diff(x.a.inicio,x.fim)+1}</td><td><span class="pill ${st[1]}">${st[0]}</span></td><td>${x.a.docEntregue?'Entregue':'<span class="pill neg">Pendente</span>'}</td></tr>`}).join('')||`<tr><td colspan="7" class="emptystate"><b>Nenhum registro em ${MESES[m-1]}</b>Use Registrar atestado para lançar o primeiro.</td></tr>`}</tbody></table></div></section>
+   </div>`;
+  main.querySelector('#mp').onclick=()=>{S.afaMonth=addMonths(m0,-1).slice(0,7);renderTab()};
+  main.querySelector('#mn').onclick=()=>{S.afaMonth=addMonths(m0,1).slice(0,7);renderTab()};
+  main.querySelector('#aT').onchange=e=>{S.afaTeam=e.target.value;renderTab()};
+  main.querySelector('#aTp').onchange=e=>{S.afaTipo=e.target.value;renderTab()};
+  main.querySelector('#addAf').onclick=()=>afDialog();
+  main.querySelector('#expAf').onclick=exportAfast;
+  main.querySelectorAll('[data-af]').forEach(r=>{r.onclick=()=>afDialog(r.dataset.af);r.onkeydown=e=>{if(e.key==='Enter')afDialog(r.dataset.af)}});
+}
+function afDialog(id){
+  const a=id?S.afa[id]:{funcionarioId:'',tipo:'Atestado médico',inicio:todayISO(),dias:1,fim:'',docEntregue:false,obs:''};
+  const dias=id?diff(a.inicio,afaFim(a))+1:1;
+  openDlg(`<h3>${id?'Editar registro':'Registrar atestado ou afastamento'}</h3>
+   <div class="fgrid">
+    <label class="field full">Funcionário<select class="input" name="funcionarioId" required><option value="">Selecione</option>${empOptions(a.funcionarioId)}</select></label>
+    <label class="field full">Tipo<select class="input" name="tipo">${TIPOS.map(t=>`<option ${a.tipo===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="field">Início<input class="input" type="date" name="inicio" required value="${esc(a.inicio)}"></label>
+    <label class="field">Dias<input class="input" type="number" min="1" name="dias" value="${dias}"></label>
+    <label class="field full">Último dia<input class="input" type="date" name="fim" value="${esc(afaFim(a))}"></label>
+    <label class="field full" style="flex-direction:row;align-items:center;gap:8px;font-weight:400"><input type="checkbox" name="docEntregue" ${a.docEntregue?'checked':''} style="width:18px;height:18px"> Documento entregue ao RH</label>
+    <label class="field full">Observação<textarea class="input" name="obs" rows="2">${esc(a.obs)}</textarea></label>
+   </div><div class="warnbox" id="aw"></div>
+   <div class="formfoot">${id?'<button type="button" class="btn danger left" id="delA">Excluir registro</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
+  v=>{if(!v.funcionarioId||!validISO(v.inicio)){toast('Escolha o funcionário e a data de início');return false}
+     const fim=validISO(v.fim)&&v.fim>=v.inicio?v.fim:addDays(v.inicio,(+v.dias||1)-1);
+     Store.put('afa',id||uid('a'),{funcionarioId:v.funcionarioId,tipo:v.tipo,inicio:v.inicio,fim,dias:diff(v.inicio,fim)+1,docEntregue:!!v.docEntregue,obs:v.obs||''});toast('Registro salvo')});
+  const form=document.getElementById('dlgForm');
+  form.querySelector('[name=dias]').oninput=e=>{const i=form.inicio.value;if(validISO(i))form.fim.value=addDays(i,(+e.target.value||1)-1)};
+  form.querySelector('[name=inicio]').oninput=e=>{if(validISO(e.target.value))form.fim.value=addDays(e.target.value,(+form.dias.value||1)-1)};
+  form.querySelector('[name=fim]').oninput=e=>{const i=form.inicio.value;if(validISO(i)&&validISO(e.target.value)&&e.target.value>=i)form.dias.value=diff(i,e.target.value)+1};
+  const chk=()=>{const v=Object.fromEntries(new FormData(form));const w=[];
+    if(v.funcionarioId&&validISO(v.inicio)&&validISO(v.fim)){const fe=Object.values(S.fer).find(f=>f.funcionarioId===v.funcionarioId&&f.inicio<=v.fim&&ferFim(f)>=v.inicio);if(fe)w.push(`Coincide com férias de ${fmt(fe.inicio)} a ${fmt(ferFim(fe))}.`);
+      if(+v.dias>15&&/Atestado/.test(v.tipo))w.push('Mais de 15 dias: verifique o encaminhamento ao INSS com o RH.')}
+    document.getElementById('aw').innerHTML=w.map(esc).join('<br>')};
+  form.oninput=chk;form.onchange=chk;chk();
+  if(id)document.getElementById('delA').onclick=()=>{if(confirm('Excluir este registro?')){Store.del('afa',id);closeDlg();toast('Registro excluído')}};
+}
+
+/* ===================== Diálogo, aviso e navegação ===================== */
+const dlg=document.getElementById('dlg');
+function openDlg(html,onOk){
+  if(document.body.classList.contains('ro')){toast('Seu perfil é somente leitura');return}
+  const form=document.getElementById('dlgForm');form.innerHTML=html;form.oninput=null;form.onchange=null;
+  form.onsubmit=e=>{e.preventDefault();const v=Object.fromEntries(new FormData(form));if(onOk(v)!==false)closeDlg()};
+  form.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeDlg);
+  dlg.showModal();const first=form.querySelector('input,select,textarea');first&&first.focus();
+}
+function closeDlg(){dlg.close()}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
+
+const VIEWS={escala:viewEscala,equipes:viewEquipes,ferias:viewFerias,afast:viewAfast};
+function renderTab(){
+  const main=document.getElementById('main');renderSide();
+  if(!S.ready){main.innerHTML=`<div class="titlerow"><div class="t"><h1>${TITLES[S.tab]}</h1><p class="finding">Carregando dados da equipe.</p></div></div>`;return}
+  if(!Object.keys(S.func).length&&S.tab!=='escala'){
+    main.innerHTML=`<div class="titlerow"><div class="t"><h1>${TITLES[S.tab]}</h1><p class="finding">Nenhum funcionário cadastrado ainda.</p></div></div><div class="panel emptystate"><b>Comece pelo time</b>Cadastre o primeiro funcionário ou restaure um backup em Escala operacional.<div style="margin-top:14px"><button class="btn primary" id="first">Novo funcionário</button></div></div>`;
+    main.querySelector('#first').onclick=()=>empDialog();return}
+  VIEWS[S.tab](main);
+}
+function renderAll(keepScroll){
+  const y=window.scrollY;renderSide();
+  if(dlg.open&&keepScroll)return;
+  renderTab();if(keepScroll)window.scrollTo(0,y);
+}
+function go(tab){S.tab=tab;try{history.replaceState(null,'','#'+tab)}catch(e){}document.getElementById('side').classList.remove('open');renderAll();window.scrollTo(0,0)}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.tab));
+document.getElementById('openSide').onclick=()=>document.getElementById('side').classList.add('open');
+document.getElementById('closeSide').onclick=()=>document.getElementById('side').classList.remove('open');
+const h0=(location.hash||'').slice(1);S.tab=VIEWS[h0]?h0:'escala';
+dlg.addEventListener('close',()=>scheduleRender());
+
+(function(){const k='timeGate.tema';let t=null;try{t=localStorage.getItem(k)}catch(e){}if(t)document.documentElement.dataset.theme=t;
+  const btn=document.getElementById('themeBtn');
+  const isDark=()=>document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  const lbl=()=>{btn.textContent=isDark()?'Tema claro':'Tema escuro'};lbl();
+  btn.onclick=()=>{const n=isDark()?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem(k,n)}catch(e){}lbl()}})();
+
+/* Tela de login */
+const ERROS={'auth/invalid-credential':'Email ou senha incorretos.','auth/wrong-password':'Email ou senha incorretos.','auth/user-not-found':'Email ou senha incorretos.','auth/invalid-email':'Email inválido.','auth/too-many-requests':'Muitas tentativas. Aguarde alguns minutos e tente de novo.','auth/user-disabled':'Este usuário foi desativado.','auth/network-request-failed':'Sem conexão com a internet.'};
+function showLogin(msg,code){const l=document.getElementById('login');l.hidden=false;
+  document.getElementById('loginMsg').innerHTML=msg?esc(msg)+(code?`<code>${esc(code)}</code>`:''):'';
+  const e=l.querySelector('[name=email]');setTimeout(()=>e.focus(),50)}
+function hideLogin(){document.getElementById('login').hidden=true;document.getElementById('loginMsg').innerHTML=''}
+document.getElementById('loginForm').onsubmit=async ev=>{ev.preventDefault();const f=Object.fromEntries(new FormData(ev.target));const b=document.getElementById('loginBtn');
+  b.disabled=true;b.textContent='Entrando';document.getElementById('loginMsg').innerHTML='';
+  try{await Store.login(f.email.trim(),f.senha)}catch(e){document.getElementById('loginMsg').textContent=ERROS[e.code]||('Não foi possível entrar: '+(e.message||e.code))}
+  b.disabled=false;b.textContent='Entrar'};
+document.getElementById('forgot').onclick=async()=>{const em=document.querySelector('#loginForm [name=email]').value.trim();
+  if(!em){document.getElementById('loginMsg').textContent='Digite seu email acima e clique de novo em Esqueci minha senha.';return}
+  try{await Store.reset(em);toast('Enviamos um link para redefinir a senha')}catch(e){document.getElementById('loginMsg').textContent=ERROS[e.code]||'Não foi possível enviar o email.'}};
+
+Store.init();
+setInterval(renderSide,60000);
+</script>
+</body>
+</html>
