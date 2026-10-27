@@ -16,12 +16,12 @@
    Cole aqui o firebaseConfig do seu projeto: Console do Firebase > Configurações do projeto > Seus apps > App da Web.
    Com os campos vazios, a aplicação funciona sem login e salva só no navegador. */
 window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCYxUE1EBGBEONhPtl3tKI9KpwX87-Uc3Q",
-  authDomain: "time-gate-jbs.firebaseapp.com",
-  projectId: "time-gate-jbs",
-  storageBucket: "time-gate-jbs.firebasestorage.app",
-  messagingSenderId: "595247098020",
-  appId: "1:595247098020:web:a0428a39be57870a9dde31"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
 </script>
 <style>
@@ -325,6 +325,25 @@ dialog form{padding:22px 24px 20px}
 dialog h3{font-size:18px;line-height:24px;margin-bottom:18px}
 .warnbox{background:var(--warnBg);color:var(--warnInk);border-radius:var(--rc);padding:10px 12px;font-size:13px;margin-top:14px}
 .warnbox:empty{display:none}
+/* Atestado não apresentado: alerta em vermelho */
+.negtxt{color:var(--negative)!important}
+.pendpanel{border-color:var(--negative);box-shadow:inset 4px 0 0 var(--negative)}
+.pendpanel .ph h2{color:var(--negative)}
+.pendlist{list-style:none;margin:0;padding:0 20px 12px 24px}
+.pendlist li{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.pendlist li:last-child{border-bottom:0}
+.pendact{display:flex;gap:2px}
+table.data tr.pendrow td{background:var(--negBg)}
+table.data tr.pendrow td:first-child{box-shadow:inset 3px 0 0 var(--negative)}
+table.data tr.pendrow:hover td{background:var(--negBg);filter:brightness(.98)}
+table.data tfoot td{border-top:1px solid var(--border);border-bottom:0;padding-top:12px;padding-bottom:12px}
+.choice{border:0;padding:0;margin:0;display:flex;flex-direction:row;flex-wrap:wrap;gap:8px}
+.choice legend{padding:0;margin-bottom:8px;font-weight:500}
+.choice label{display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--control);border-radius:var(--rc);font-weight:400;cursor:pointer;flex:1;min-width:180px}
+.choice label:has(input:checked){border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text)}
+.choice label.no:has(input:checked){border-color:var(--negative);box-shadow:inset 0 0 0 1px var(--negative);background:var(--negBg);color:var(--negInk)}
+.choice input{width:16px;height:16px;margin:0}
+@media (max-width:640px){.pendlist li{grid-template-columns:22px minmax(0,1fr) auto}.pendact{grid-column:2/-1}}
 /* Login */
 .login{position:fixed;inset:0;z-index:80;background:var(--ground);display:grid;place-items:center;padding:24px}
 .login[hidden]{display:none}
@@ -402,7 +421,8 @@ dialog h3{font-size:18px;line-height:24px;margin-bottom:18px}
       <button data-tab="escala"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3M5 9h1M8 9h1M11 9h1M5 11.5h1M8 11.5h1"/></svg><span>Escala operacional</span></button>
       <button data-tab="equipes"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><circle cx="6" cy="5.5" r="2.5"/><path d="M1.5 13.5c.5-2.5 2.3-4 4.5-4s4 1.5 4.5 4"/><path d="M10.5 3.2a2.4 2.4 0 1 1 0 4.6M12 9.8c1.3.5 2.2 1.8 2.5 3.7"/></svg><span>Equipes</span></button>
       <button data-tab="ferias"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="2" y="5" width="12" height="8.5" rx="1.5"/><path d="M5.5 5V3.2c0-.4.3-.7.7-.7h3.6c.4 0 .7.3.7.7V5M2 8.5h12"/></svg><span>Férias</span></button>
-      <button data-tab="afast"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="3" y="2.5" width="10" height="11.5" rx="1.5"/><path d="M6 2.5V1.8h4v.7M8 6v4M6 8h4"/></svg><span>Atestados e afastamentos</span></button>
+      <button data-tab="afast"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="3" y="2.5" width="10" height="11.5" rx="1.5"/><path d="M6 2.5V1.8h4v.7M8 6v4M6 8h4"/></svg><span>Atestados</span></button>
+      <button data-tab="he"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="1.5"><circle cx="8" cy="8.5" r="5.5"/><path d="M8 5.5v3l2 1.5M6.5 1.5h3"/></svg><span>Horas extras</span></button>
     </nav>
     <div class="grouplabel">Em serviço agora</div>
     <div class="now" id="nowBox"></div>
@@ -457,7 +477,7 @@ const DEFAULT_CFG={
   refDate:'2026-10-26', refDupla:'CD', semestreInicio:'2026-07-01', mesesTroca:6,
   diurnoCD:'Charlie', diurnoAB:'Alpha', minTurno:0, limiteDias:305, maxFeriasEquipe:2, confirmado:false
 };
-const S={func:{},fer:{},afa:{},cfg:{...DEFAULT_CFG},tab:'equipes',month:todayISO().slice(0,7),selDay:todayISO(),
+const S={func:{},fer:{},afa:{},he:{},heMonth:todayISO().slice(0,7),heTeam:'',heMotivo:'',cfg:{...DEFAULT_CFG},tab:'equipes',month:todayISO().slice(0,7),selDay:todayISO(),
   q:'',ferTeam:'',ferStatus:'',afaMonth:todayISO().slice(0,7),afaTeam:'',afaTipo:'',ready:false};
 
 /* ===================== Armazenamento ===================== */
@@ -465,9 +485,9 @@ const S={func:{},fer:{},afa:{},cfg:{...DEFAULT_CFG},tab:'equipes',month:todayISO
 const LKEY='timeGate.v1';
 const Store={
   mode:'local',db:null,
-  loadLocal(){try{const j=JSON.parse(localStorage.getItem(LKEY)||'null');if(j){S.func=j.func||{};S.fer=j.fer||{};S.afa=j.afa||{};S.cfg={...DEFAULT_CFG,...(j.cfg||{})}}}catch(e){}},
-  saveLocal(){if(this.mode!=='local')return;try{localStorage.setItem(LKEY,JSON.stringify({func:S.func,fer:S.fer,afa:S.afa,cfg:S.cfg}))}catch(e){}},
-  colMap:{func:'funcionarios',fer:'ferias',afa:'afastamentos'},
+  loadLocal(){try{const j=JSON.parse(localStorage.getItem(LKEY)||'null');if(j){S.func=j.func||{};S.fer=j.fer||{};S.afa=j.afa||{};S.he=j.he||{};S.cfg={...DEFAULT_CFG,...(j.cfg||{})}}}catch(e){}},
+  saveLocal(){if(this.mode!=='local')return;try{localStorage.setItem(LKEY,JSON.stringify({func:S.func,fer:S.fer,afa:S.afa,he:S.he,cfg:S.cfg}))}catch(e){}},
+  colMap:{func:'funcionarios',fer:'ferias',afa:'afastamentos',he:'horasExtras'},
   unsubs:[],
   async init(){
     const fc=window.FIREBASE_CONFIG;
@@ -479,11 +499,11 @@ const Store={
     if(!(window.claude&&typeof window.claude.use==='function'))return;
     let db=null;try{db=await window.claude.use('db')}catch(e){}
     if(!db)return;
-    this.db=db;this.mode='db';S.func={};S.fer={};S.afa={};S.cfg={...DEFAULT_CFG};S.ready=false;setSync();renderAll();
+    this.db=db;this.mode='db';S.func={};S.fer={};S.afa={};S.he={};S.cfg={...DEFAULT_CFG};S.ready=false;setSync();renderAll();
     this.subscribe();
   },
   subscribe(){
-    const db=this.db;let pending=3;
+    const db=this.db;let pending=Object.keys(this.colMap).length;
     for(const [k,col] of Object.entries(this.colMap)){
       this.unsubs.push(db.collection(col).onSnapshot(snap=>{
         const o={};snap.docs.forEach(d=>{o[d.id]=d.data()});S[k]=o;
@@ -499,7 +519,7 @@ const Store={
     S.ready=false;setSync();
     this.auth.onAuthStateChanged(async u=>{
       this.unsubs.forEach(f=>{try{f()}catch(e){}});this.unsubs=[];
-      S.func={};S.fer={};S.afa={};S.cfg={...DEFAULT_CFG};S.ready=false;S.user=null;
+      S.func={};S.fer={};S.afa={};S.he={};S.cfg={...DEFAULT_CFG};S.ready=false;S.user=null;
       if(!u){showLogin();renderAll();return}
       let perfil=null;
       try{const d=await this.db.doc('usuarios/'+u.uid).get();if(d.exists)perfil=d.data()}catch(e){}
@@ -642,24 +662,30 @@ function exportFerias(){
   xlsx(`Ferias_Gate_${todayISO()}.xlsx`,[['Férias',rows]]);
 }
 function exportAfast(){
-  const rows=[['Funcionário','Matrícula','Equipe','Tipo','Início','Fim','Dias','Documento entregue','Observação']];
-  Object.values(S.afa).sort((a,b)=>b.inicio.localeCompare(a.inicio)).forEach(a=>{const e=S.func[a.funcionarioId]||{};rows.push([e.nome||'',e.matricula||'',e.equipe||'',a.tipo,fmt(a.inicio),fmt(afaFim(a)),diff(a.inicio,afaFim(a))+1,a.docEntregue?'Sim':'Não',a.obs||''])});
+  const rows=[['Funcionário','Matrícula','Equipe','Tipo','Início','Fim','Dias','Atestado apresentado','Observação']];
+  Object.values(S.afa).sort((a,b)=>b.inicio.localeCompare(a.inicio)).forEach(a=>{const e=S.func[a.funcionarioId]||{};rows.push([e.nome||'',e.matricula||'',e.equipe||'',a.tipo,fmt(a.inicio),fmt(afaFim(a)),diff(a.inicio,afaFim(a))+1,a.docEntregue?'Sim':'Não apresentado',a.obs||''])});
   xlsx(`Atestados_Gate_${todayISO()}.xlsx`,[['Atestados',rows]]);
 }
-function backupJSON(){saveFile(`backup_time_gate_${todayISO()}.json`,JSON.stringify({versao:1,gerado:new Date().toISOString(),funcionarios:S.func,ferias:S.fer,afastamentos:S.afa,config:S.cfg},null,1))}
+function backupJSON(){saveFile(`backup_time_gate_${todayISO()}.json`,JSON.stringify({versao:1,gerado:new Date().toISOString(),funcionarios:S.func,ferias:S.fer,afastamentos:S.afa,horasExtras:S.he,config:S.cfg},null,1))}
 async function restoreJSON(file){
   if(!file)return;let j;try{j=JSON.parse(await file.text())}catch(e){toast('Arquivo inválido');return}
   if(!j.funcionarios){toast('Arquivo não é um backup desta aplicação');return}
-  if(!confirm(`Restaurar ${Object.keys(j.funcionarios).length} funcionários, ${Object.keys(j.ferias||{}).length} férias e ${Object.keys(j.afastamentos||{}).length} afastamentos? Registros com o mesmo código serão substituídos.`))return;
+  if(!confirm(`Restaurar ${Object.keys(j.funcionarios).length} funcionários, ${Object.keys(j.ferias||{}).length} férias e ${Object.keys(j.afastamentos||{}).length} afastamentos e ${Object.keys(j.horasExtras||{}).length} horas extras? Registros com o mesmo código serão substituídos.`))return;
   for(const [k,v] of Object.entries(j.funcionarios))await Store.put('func',k,v);
   for(const [k,v] of Object.entries(j.ferias||{}))await Store.put('fer',k,v);
   for(const [k,v] of Object.entries(j.afastamentos||{}))await Store.put('afa',k,v);
+  for(const [k,v] of Object.entries(j.horasExtras||{}))await Store.put('he',k,v);
   if(j.config)await Store.putCfg({...S.cfg,...j.config});toast('Backup restaurado');
 }
 
+function exportHE(){
+  const rows=[['Data','Funcionário','Matrícula','Equipe','Início','Fim','Horas','Motivo','Observação']];
+  Object.values(S.he).sort((a,b)=>b.data.localeCompare(a.data)||b.inicio.localeCompare(a.inicio)).forEach(h=>{const e=S.func[h.funcionarioId]||{};rows.push([fmt(h.data),e.nome||'',e.matricula||'',e.equipe||'',h.inicio,h.fim,+(heMin(h)/60).toFixed(2),h.motivo,h.obs||''])});
+  xlsx(`Horas_extras_Gate_${todayISO()}.xlsx`,[['Horas extras',rows]]);
+}
 /* ===================== Interface ===================== */
 const DIASL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
-const TITLES={escala:'Escala operacional',equipes:'Equipes',ferias:'Férias',afast:'Atestados e afastamentos'};
+const TITLES={escala:'Escala operacional',equipes:'Equipes',ferias:'Férias',afast:'Atestados e afastamentos',he:'Horas extras'};
 const mono=(t,lg)=>t?`<span class="mono ${t} ${lg?'lg':''}" aria-hidden="true">${t[0]}</span>`:`<span class="mono ${lg?'lg':''}" aria-hidden="true">-</span>`;
 const nm=e=>esc(titleCase(e.nome));
 const plural=(n,s,p)=>`${n} ${n===1?s:(p||s+'s')}`;
@@ -677,6 +703,8 @@ function renderSide(){
   const late=ativos().filter(([id,e])=>e.situacao==='Ativo'&&(()=>{const u=ferSituacao(id).u;return u&&(u.t==='Vencido'||u.t==='Atrasado')})()).length;
   const fb=document.querySelector('#nav [data-tab="ferias"]');fb.querySelector('.badge')?.remove();
   if(late)fb.insertAdjacentHTML('beforeend',`<span class="badge" title="${plural(late,'período vencido ou atrasado','períodos vencidos ou atrasados')}">${late}</span>`);
+  const ab=document.querySelector('#nav [data-tab="afast"]');ab.querySelector('.badge')?.remove();const np=Object.values(S.afa).filter(a=>!a.docEntregue).length;
+  if(np)ab.insertAdjacentHTML('beforeend',`<span class="badge" title="${plural(np,'atestado não apresentado','atestados não apresentados')}">${np}</span>`);
 }
 
 /* ===================== Escala operacional ===================== */
@@ -708,7 +736,7 @@ function viewEscala(main){
 
   const sel=S.selDay;const ss=shiftOn(sel);
   const crewList=(t,per)=>{const st=teamStatus(t,sel);return `<div><div class="dh">${mono(t)}<b>${t} ${per}</b><span>${st.inn.length} de ${st.total} disponíveis</span></div>
-    <ul class="people">${st.inn.map(x=>`<li>${nm(x.e)}${x.e.setor==='Focal Gate'?'<span class="pill">Focal</span>':''}</li>`).join('')}${st.out.map(x=>`<li class="out">${nm(x.e)}${pillFor(x.ab)}</li>`).join('')}</ul></div>`};
+    <ul class="people">${st.inn.map(x=>{const he=Object.values(S.he).filter(h=>h.funcionarioId===x.id&&h.data===sel);return `<li>${nm(x.e)}${he.length?`<span class="pill hue" title="${esc(he.map(h=>h.inicio+' às '+h.fim+', '+h.motivo).join('; '))}">HE ${fmtH(he.reduce((s,h)=>s+heMin(h),0))}</span>`:''}${x.e.setor==='Focal Gate'?'<span class="pill">Focal</span>':''}</li>`}).join('')}${st.out.map(x=>`<li class="out">${nm(x.e)}${pillFor(x.ab)}</li>`).join('')}</ul></div>`};
 
   main.innerHTML=`
    <div class="titlerow"><div class="t"><h1>Escala operacional</h1><p class="finding">${finding}</p></div>
@@ -826,10 +854,11 @@ function empDialog(id){
   f=>{const nid=id||(f.matricula?'m'+f.matricula:uid('n-'));if(!id&&S.func[nid]){toast('Já existe funcionário com essa matrícula');return false}
      Store.put('func',nid,{...e,...f,nome:f.nome.trim().toUpperCase()});toast('Funcionário salvo');});
   if(id)document.getElementById('delEmp').onclick=()=>{
-    const nF=Object.values(S.fer).filter(x=>x.funcionarioId===id).length+Object.values(S.afa).filter(x=>x.funcionarioId===id).length;
-    if(confirm(`Excluir ${e.nome}?${nF?`\nOs ${nF} registros de férias e afastamentos dele também serão excluídos.`:''}\nPara manter o histórico, prefira mudar a situação para Desligado.`)){
+    const nF=Object.values(S.fer).filter(x=>x.funcionarioId===id).length+Object.values(S.afa).filter(x=>x.funcionarioId===id).length+Object.values(S.he).filter(x=>x.funcionarioId===id).length;
+    if(confirm(`Excluir ${e.nome}?${nF?`\nOs ${nF} registros de férias, afastamentos e horas extras dele também serão excluídos.`:''}\nPara manter o histórico, prefira mudar a situação para Desligado.`)){
       Object.entries(S.fer).forEach(([k,x])=>{if(x.funcionarioId===id)Store.del('fer',k)});
       Object.entries(S.afa).forEach(([k,x])=>{if(x.funcionarioId===id)Store.del('afa',k)});
+      Object.entries(S.he).forEach(([k,x])=>{if(x.funcionarioId===id)Store.del('he',k)});
       Store.del('func',id);closeDlg();toast('Funcionário excluído')}};
 }
 
@@ -918,7 +947,7 @@ function ferDialog(fid,empId){
     <label class="field full">Período aquisitivo<select class="input" name="periodoInicio" id="perSel"></select></label>
     <label class="field">Início do gozo<input class="input" type="date" name="inicio" required value="${esc(f.inicio)}"></label>
     <label class="field">Dias<select class="input" name="dias">${[10,15,20,30,...[5,14,25].filter(x=>x===+f.dias)].map(d=>`<option ${+f.dias===d?'selected':''}>${d}</option>`).join('')}</select><span class="hint">20 dias quando há abono de 10</span></label>
-    <div class="field full" style="font-weight:400">Retorno previsto: <b id="ret" style="font-weight:600">-</b></div>
+    <div class="field full" style="font-weight:400;flex-direction:row;gap:6px">Retorno previsto: <b id="ret" style="font-weight:600">-</b></div>
     <label class="field full">Observação<textarea class="input" name="obs" rows="2">${esc(f.obs)}</textarea></label>
    </div><div class="warnbox" id="fw"></div>
    <div class="formfoot">${fid?'<button type="button" class="btn danger left" id="delF">Excluir férias</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
@@ -946,6 +975,8 @@ function ferDialog(fid,empId){
 
 /* ===================== Atestados e afastamentos ===================== */
 const TIPOS=['Atestado médico','Atestado odontológico','Declaração de comparecimento','Acompanhamento de familiar','Acidente de trabalho','Afastamento INSS','Licença maternidade','Licença paternidade','Licença nojo','Outro'];
+const pendAll=()=>Object.entries(S.afa).filter(([,a])=>!a.docEntregue).map(([id,a])=>({id,a,e:S.func[a.funcionarioId]||{nome:'(removido)'},fim:afaFim(a)})).sort((x,y)=>x.a.inicio.localeCompare(y.a.inicio));
+function marcarApresentado(id){const a=S.afa[id];if(!a)return;if(document.body.classList.contains('ro')){toast('Seu perfil é somente leitura');return}Store.put('afa',id,{...a,docEntregue:true});toast('Atestado marcado como apresentado')}
 function viewAfast(main){
   const hoje=todayISO();const m0=`${S.afaMonth}-01`;const m1=addDays(addMonths(m0,1),-1);
   const all=Object.entries(S.afa).map(([id,a])=>({id,a,e:S.func[a.funcionarioId]||{nome:'(removido)'},fim:afaFim(a)}));
@@ -954,29 +985,32 @@ function viewAfast(main){
   let list=all.filter(x=>ov(x.a.inicio,x.fim,m0,m1));
   if(S.afaTeam)list=list.filter(x=>(x.e.equipe||'')===S.afaTeam);
   if(S.afaTipo)list=list.filter(x=>x.a.tipo===S.afaTipo);
-  list.sort((a,b)=>b.a.inicio.localeCompare(a.a.inicio));
+  list.sort((a,b)=>(a.a.docEntregue?1:0)-(b.a.docEntregue?1:0)||b.a.inicio.localeCompare(a.a.inicio));
   const hojeList=all.filter(x=>x.a.inicio<=hoje&&hoje<=x.fim);
   const afastados=Object.values(S.func).filter(e=>e.situacao==='Afastado');
   const monthAll=all.filter(x=>ov(x.a.inicio,x.fim,m0,m1));
   const diasMes=monthAll.reduce((s,x)=>s+daysIn(x,m0,m1),0);
-  const pend=all.filter(x=>!x.a.docEntregue);
+  const pend=pendAll();
   const d90=addDays(hoje,-89);
   const byTeam=TEAMS.map(t=>{const xs=all.filter(x=>x.e.equipe===t&&ov(x.a.inicio,x.fim,d90,hoje));return{t,n:xs.length,d:xs.reduce((s,x)=>s+daysIn(x,d90,hoje),0)}}).sort((a,b)=>b.d-a.d);
   const maxD=Math.max(1,...byTeam.map(b=>b.d));
   const people={};all.filter(x=>ov(x.a.inicio,x.fim,d90,hoje)).forEach(x=>{const k=x.a.funcionarioId;people[k]=people[k]||{e:x.e,n:0,d:0};people[k].n++;people[k].d+=daysIn(x,d90,hoje)});
   const top=Object.values(people).sort((a,b)=>b.n-a.n||b.d-a.d).slice(0,4);
   const [y,m]=S.afaMonth.split('-').map(Number);
-  const finding=(hojeList.length+afastados.length)?`<b>${plural(hojeList.length+afastados.length,'pessoa fora','pessoas fora')} hoje</b>${hojeList.length?': '+hojeList.slice(0,3).map(x=>`${esc(titleCase(x.e.nome))} até ${fmtS(x.fim)}`).join(', '):''}${afastados.length?`${hojeList.length?', mais ':': '}${plural(afastados.length,'afastado','afastados')} sem data de retorno`:''}.${pend.length?` ${plural(pend.length,'documento pendente','documentos pendentes')} de entrega ao RH.`:''}`:`Ninguém fora por atestado hoje.${pend.length?` ${plural(pend.length,'documento pendente','documentos pendentes')} de entrega ao RH.`:''}`;
+  const fora=hojeList.length+afastados.length;
+  const finding=(pend.length?`<b class="negtxt">${plural(pend.length,'atestado não apresentado','atestados não apresentados')}</b>. `:'Todos os atestados registrados foram apresentados. ')+(fora?`${plural(fora,'pessoa fora','pessoas fora')} hoje${hojeList.length?': '+hojeList.slice(0,3).map(x=>`${esc(titleCase(x.e.nome))} até ${fmtS(x.fim)}`).join(', '):''}${afastados.length?`${hojeList.length?', mais ':': '}${plural(afastados.length,'afastado','afastados')} sem data de retorno`:''}.`:'Ninguém fora por atestado hoje.');
   main.innerHTML=`
    <div class="titlerow"><div class="t"><h1>Atestados e afastamentos</h1><p class="finding">${finding}</p></div>
     <div class="tools"><div class="seg"><button id="mp" aria-label="Mês anterior"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 2.5L4.5 7 9 11.5"/></svg></button><span class="lbl">${MESES[m-1]} ${y}</span><button id="mn" aria-label="Próximo mês"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 2.5L9.5 7 5 11.5"/></svg></button></div>
      <button class="btn" id="expAf">Exportar</button><button class="btn primary" id="addAf">Registrar atestado</button></div></div>
    <div class="stack">
+    ${pend.length?`<section class="panel pendpanel" aria-label="Atestados não apresentados"><div class="ph"><h2>Atestado não apresentado</h2><span class="sub">${plural(pend.length,'registro','registros')} de todos os meses, mais antigos primeiro</span></div>
+     <ul class="pendlist">${pend.map(x=>{const dd=diff(x.a.inicio,hoje);return `<li><span class="mono ${esc(x.e.equipe||'')}" aria-hidden="true">${x.e.equipe?x.e.equipe[0]:'-'}</span><div class="two" style="min-width:0"><b>${nm(x.e)}</b><small>${esc(x.a.tipo)}, ${fmt(x.a.inicio)} a ${fmt(x.fim)}${dd>0?`, há ${plural(dd,'dia')}`:''}</small></div><span class="pill neg">Não apresentado</span><span class="pendact"><button class="act" data-ok="${x.id}">Marcar apresentado</button><button class="act" data-af="${x.id}">Abrir</button></span></li>`}).join('')}</ul></section>`:''}
     <section class="panel strip" aria-label="Resumo do mês">
-     <div><div class="l">Fora hoje</div><div class="v num" style="text-align:left">${hojeList.length+afastados.length}</div><div class="s">${hojeList.length} por atestado, ${afastados.length} afastados</div></div>
+     <div><div class="l">Atestado não apresentado</div><div class="v num ${pend.length?'neg':''}" style="text-align:left">${pend.length}</div><div class="s">Somando todos os meses</div></div>
+     <div><div class="l">Fora hoje</div><div class="v num" style="text-align:left">${fora}</div><div class="s">${hojeList.length} por atestado, ${afastados.length} afastados</div></div>
      <div><div class="l">Registros em ${MESES[m-1]}</div><div class="v num" style="text-align:left">${monthAll.length}</div><div class="s">${monthAll.filter(x=>/Atestado/.test(x.a.tipo)).length} atestados</div></div>
      <div><div class="l">Dias de ausência em ${MESES[m-1]}</div><div class="v num" style="text-align:left">${diasMes}<small> dias</small></div><div class="s">Somando todos os registros do mês</div></div>
-     <div><div class="l">Documento pendente</div><div class="v num ${pend.length?'neg':''}" style="text-align:left">${pend.length}</div><div class="s">Ainda não entregue ao RH</div></div>
     </section>
     <div class="cols2">
      <section class="panel"><div class="ph"><h2>Dias de ausência por equipe</h2><span class="sub">Últimos 90 dias</span></div>
@@ -987,9 +1021,9 @@ function viewAfast(main){
     <section class="panel"><div class="ph"><h2>Registros de ${MESES[m-1]}</h2>
       <select class="input" id="aT" aria-label="Equipe"><option value="">Todas as equipes</option>${TEAMS.map(t=>`<option ${S.afaTeam===t?'selected':''}>${t}</option>`).join('')}</select>
       <select class="input" id="aTp" aria-label="Tipo"><option value="">Todos os tipos</option>${TIPOS.map(t=>`<option ${S.afaTipo===t?'selected':''}>${t}</option>`).join('')}</select></div>
-     <div class="tablewrap"><table class="data"><thead><tr><th>Funcionário</th><th>Equipe</th><th>Tipo</th><th class="num">Período</th><th class="num">Dias</th><th>Situação</th><th>Documento</th></tr></thead>
+     <div class="tablewrap"><table class="data"><thead><tr><th>Funcionário</th><th>Equipe</th><th>Tipo</th><th class="num">Período</th><th class="num">Dias</th><th>Situação</th><th>Atestado</th></tr></thead>
      <tbody>${list.map(x=>{const st=x.fim<hoje?['Encerrado','']:x.a.inicio>hoje?['Futuro','hue']:['Em curso','warn'];
-      return `<tr class="click" data-af="${x.id}" tabindex="0"><td class="two"><b>${nm(x.e)}</b>${x.a.obs?`<small>${esc(x.a.obs)}</small>`:''}</td><td><span class="teamcell">${mono(x.e.equipe)}${esc(x.e.equipe||'Sem equipe')}</span></td><td>${esc(x.a.tipo)}</td><td class="num">${fmt(x.a.inicio)} a ${fmt(x.fim)}</td><td class="num">${diff(x.a.inicio,x.fim)+1}</td><td><span class="pill ${st[1]}">${st[0]}</span></td><td>${x.a.docEntregue?'Entregue':'<span class="pill neg">Pendente</span>'}</td></tr>`}).join('')||`<tr><td colspan="7" class="emptystate"><b>Nenhum registro em ${MESES[m-1]}</b>Use Registrar atestado para lançar o primeiro.</td></tr>`}</tbody></table></div></section>
+      return `<tr class="click ${x.a.docEntregue?'':'pendrow'}" data-af="${x.id}" tabindex="0"><td class="two"><b>${nm(x.e)}</b>${x.a.obs?`<small>${esc(x.a.obs)}</small>`:''}</td><td><span class="teamcell">${mono(x.e.equipe)}${esc(x.e.equipe||'Sem equipe')}</span></td><td>${esc(x.a.tipo)}</td><td class="num">${fmt(x.a.inicio)} a ${fmt(x.fim)}</td><td class="num">${diff(x.a.inicio,x.fim)+1}</td><td><span class="pill ${st[1]}">${st[0]}</span></td><td>${x.a.docEntregue?'Apresentado':'<span class="pill neg">Não apresentado</span>'}</td></tr>`}).join('')||`<tr><td colspan="7" class="emptystate"><b>Nenhum registro em ${MESES[m-1]}</b>Use Registrar atestado para lançar o primeiro.</td></tr>`}</tbody></table></div></section>
    </div>`;
   main.querySelector('#mp').onclick=()=>{S.afaMonth=addMonths(m0,-1).slice(0,7);renderTab()};
   main.querySelector('#mn').onclick=()=>{S.afaMonth=addMonths(m0,1).slice(0,7);renderTab()};
@@ -997,10 +1031,11 @@ function viewAfast(main){
   main.querySelector('#aTp').onchange=e=>{S.afaTipo=e.target.value;renderTab()};
   main.querySelector('#addAf').onclick=()=>afDialog();
   main.querySelector('#expAf').onclick=exportAfast;
-  main.querySelectorAll('[data-af]').forEach(r=>{r.onclick=()=>afDialog(r.dataset.af);r.onkeydown=e=>{if(e.key==='Enter')afDialog(r.dataset.af)}});
+  main.querySelectorAll('[data-ok]').forEach(b=>b.onclick=e=>{e.stopPropagation();marcarApresentado(b.dataset.ok)});
+  main.querySelectorAll('[data-af]').forEach(r=>{r.onclick=()=>afDialog(r.dataset.af);if(r.tagName==='TR')r.onkeydown=e=>{if(e.key==='Enter')afDialog(r.dataset.af)}});
 }
 function afDialog(id){
-  const a=id?S.afa[id]:{funcionarioId:'',tipo:'Atestado médico',inicio:todayISO(),dias:1,fim:'',docEntregue:false,obs:''};
+  const a=id?S.afa[id]:{funcionarioId:'',tipo:'Atestado médico',inicio:todayISO(),dias:1,fim:'',docEntregue:null,obs:''};
   const dias=id?diff(a.inicio,afaFim(a))+1:1;
   openDlg(`<h3>${id?'Editar registro':'Registrar atestado ou afastamento'}</h3>
    <div class="fgrid">
@@ -1009,13 +1044,17 @@ function afDialog(id){
     <label class="field">Início<input class="input" type="date" name="inicio" required value="${esc(a.inicio)}"></label>
     <label class="field">Dias<input class="input" type="number" min="1" name="dias" value="${dias}"></label>
     <label class="field full">Último dia<input class="input" type="date" name="fim" value="${esc(afaFim(a))}"></label>
-    <label class="field full" style="flex-direction:row;align-items:center;gap:8px;font-weight:400"><input type="checkbox" name="docEntregue" ${a.docEntregue?'checked':''} style="width:18px;height:18px"> Documento entregue ao RH</label>
+    <fieldset class="field full choice"><legend>Apresentou o atestado?</legend>
+      <label><input type="radio" name="docEntregue" value="sim" ${a.docEntregue===true?'checked':''} required> Sim, apresentou</label>
+      <label class="no"><input type="radio" name="docEntregue" value="nao" ${a.docEntregue===false?'checked':''}> Não, está pendente</label>
+    </fieldset>
     <label class="field full">Observação<textarea class="input" name="obs" rows="2">${esc(a.obs)}</textarea></label>
    </div><div class="warnbox" id="aw"></div>
    <div class="formfoot">${id?'<button type="button" class="btn danger left" id="delA">Excluir registro</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
   v=>{if(!v.funcionarioId||!validISO(v.inicio)){toast('Escolha o funcionário e a data de início');return false}
+     if(!v.docEntregue){toast('Informe se o atestado foi apresentado');return false}
      const fim=validISO(v.fim)&&v.fim>=v.inicio?v.fim:addDays(v.inicio,(+v.dias||1)-1);
-     Store.put('afa',id||uid('a'),{funcionarioId:v.funcionarioId,tipo:v.tipo,inicio:v.inicio,fim,dias:diff(v.inicio,fim)+1,docEntregue:!!v.docEntregue,obs:v.obs||''});toast('Registro salvo')});
+     Store.put('afa',id||uid('a'),{funcionarioId:v.funcionarioId,tipo:v.tipo,inicio:v.inicio,fim,dias:diff(v.inicio,fim)+1,docEntregue:v.docEntregue==='sim',obs:v.obs||''});toast(v.docEntregue==='sim'?'Registro salvo':'Registro salvo como pendente de apresentação')});
   const form=document.getElementById('dlgForm');
   form.querySelector('[name=dias]').oninput=e=>{const i=form.inicio.value;if(validISO(i))form.fim.value=addDays(i,(+e.target.value||1)-1)};
   form.querySelector('[name=inicio]').oninput=e=>{if(validISO(e.target.value))form.fim.value=addDays(e.target.value,(+form.dias.value||1)-1)};
@@ -1026,6 +1065,87 @@ function afDialog(id){
     document.getElementById('aw').innerHTML=w.map(esc).join('<br>')};
   form.oninput=chk;form.onchange=chk;chk();
   if(id)document.getElementById('delA').onclick=()=>{if(confirm('Excluir este registro?')){Store.del('afa',id);closeDlg();toast('Registro excluído')}};
+}
+
+/* ===================== Horas extras ===================== */
+const MOTIVOS_HE=['Cobertura de falta','Cobertura de férias','Pico de movimento no gate','Atraso de navio ou janela','Problema de sistema','Treinamento','Reunião','Outro'];
+const heMin=h=>{const t=s=>{const [a,b]=(s||'0:0').split(':').map(Number);return a*60+(b||0)};let d=t(h.fim)-t(h.inicio);if(d<=0)d+=1440;return d};
+const fmtH=mins=>{const h=Math.floor(mins/60),m=Math.round(mins%60);return m?`${h}h${pad(m)}`:`${h}h`};
+function viewHE(main){
+  const m0=`${S.heMonth}-01`;const m1=addDays(addMonths(m0,1),-1);const [y,m]=S.heMonth.split('-').map(Number);
+  const all=Object.entries(S.he).map(([id,h])=>({id,h,e:S.func[h.funcionarioId]||{nome:'(removido)'},min:heMin(h)}));
+  const month=all.filter(x=>x.h.data>=m0&&x.h.data<=m1);
+  let list=month;
+  if(S.heTeam)list=list.filter(x=>(x.e.equipe||'')===S.heTeam);
+  if(S.heMotivo)list=list.filter(x=>x.h.motivo===S.heMotivo);
+  list.sort((a,b)=>b.h.data.localeCompare(a.h.data)||b.h.inicio.localeCompare(a.h.inicio));
+  const tot=month.reduce((s,x)=>s+x.min,0);
+  const pessoas=new Set(month.map(x=>x.h.funcionarioId)).size;
+  const prevM0=addMonths(m0,-1);const prevTot=all.filter(x=>x.h.data>=prevM0&&x.h.data<m0).reduce((s,x)=>s+x.min,0);
+  const byTeam=TEAMS.map(t=>({t,min:month.filter(x=>x.e.equipe===t).reduce((s,x)=>s+x.min,0),n:month.filter(x=>x.e.equipe===t).length})).sort((a,b)=>b.min-a.min);
+  const maxT=Math.max(1,...byTeam.map(b=>b.min));
+  const byMot=MOTIVOS_HE.map(mo=>({mo,min:month.filter(x=>x.h.motivo===mo).reduce((s,x)=>s+x.min,0),n:month.filter(x=>x.h.motivo===mo).length})).filter(b=>b.n).sort((a,b)=>b.min-a.min).slice(0,4);
+  const maxM=Math.max(1,...byMot.map(b=>b.min));
+  const per={};month.forEach(x=>{per[x.h.funcionarioId]=per[x.h.funcionarioId]||{e:x.e,min:0};per[x.h.funcionarioId].min+=x.min});
+  const topP=Object.values(per).sort((a,b)=>b.min-a.min)[0];
+  const finding=month.length?`<b>${fmtH(tot)} de hora extra em ${MESES[m-1]}</b>, em ${plural(month.length,'registro')}. ${byMot[0]?`Principal motivo: ${esc(byMot[0].mo.toLowerCase())} (${fmtH(byMot[0].min)}).`:''}${topP?` Quem mais fez: ${nm(topP.e)}, ${fmtH(topP.min)}.`:''}`:`Nenhuma hora extra registrada em ${MESES[m-1]}.`;
+  const dif=tot-prevTot;
+  main.innerHTML=`
+   <div class="titlerow"><div class="t"><h1>Horas extras</h1><p class="finding">${finding}</p></div>
+    <div class="tools"><div class="seg"><button id="hp" aria-label="Mês anterior"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 2.5L4.5 7 9 11.5"/></svg></button><span class="lbl">${MESES[m-1]} ${y}</span><button id="hn" aria-label="Próximo mês"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 2.5L9.5 7 5 11.5"/></svg></button></div>
+     <button class="btn" id="expHE">Exportar</button><button class="btn primary" id="addHE">Registrar hora extra</button></div></div>
+   <div class="stack">
+    <section class="panel strip" aria-label="Resumo do mês">
+     <div><div class="l">Horas extras em ${MESES[m-1]}</div><div class="v num" style="text-align:left">${fmtH(tot)}</div><div class="s">${prevTot||tot?`${dif>0?'+':dif<0?'\u2212':''}${fmtH(Math.abs(dif))} sobre ${MESES[+prevM0.slice(5,7)-1]} (${fmtH(prevTot)})`:'Sem registros no mês anterior'}</div></div>
+     <div><div class="l">Registros</div><div class="v num" style="text-align:left">${month.length}</div><div class="s">${month.length?'Média de '+fmtH(tot/month.length)+' por registro':'Nenhum lançamento'}</div></div>
+     <div><div class="l">Pessoas com hora extra</div><div class="v num" style="text-align:left">${pessoas}</div><div class="s">de ${ativos().filter(([,e])=>e.situacao==='Ativo').length} ativos</div></div>
+    </section>
+    <div class="cols2">
+     <section class="panel"><div class="ph"><h2>Horas por equipe</h2><span class="sub">${MESES[m-1]}</span></div>
+      <ul class="barlist">${byTeam.map((b,i)=>`<li><div class="top">${mono(b.t)}${b.t}<span class="num">${fmtH(b.min)}<small>${plural(b.n,'registro')}</small></span></div><div class="tr"><i class="${i===0&&b.min?'hi':''}" style="width:${b.min/maxT*100}%"></i></div></li>`).join('')}</ul></section>
+     <section class="panel"><div class="ph"><h2>Horas por motivo</h2><span class="sub">${MESES[m-1]}</span></div>
+      ${byMot.length?`<ul class="barlist">${byMot.map(b=>`<li><div class="top">${esc(b.mo)}<span class="num">${fmtH(b.min)}<small>${plural(b.n,'registro')}</small></span></div><div class="tr"><i style="width:${b.min/maxM*100}%"></i></div></li>`).join('')}</ul>`:'<div class="emptystate" style="padding-top:4px">Nenhum motivo registrado no mês.</div>'}</section>
+    </div>
+    <section class="panel"><div class="ph"><h2>Lançamentos de ${MESES[m-1]}</h2>
+      <select class="input" id="hT" aria-label="Equipe"><option value="">Todas as equipes</option>${TEAMS.map(t=>`<option ${S.heTeam===t?'selected':''}>${t}</option>`).join('')}</select>
+      <select class="input" id="hM" aria-label="Motivo"><option value="">Todos os motivos</option>${MOTIVOS_HE.map(t=>`<option ${S.heMotivo===t?'selected':''}>${t}</option>`).join('')}</select></div>
+     <div class="tablewrap"><table class="data"><thead><tr><th class="num">Dia</th><th>Funcionário</th><th>Equipe</th><th class="num">Horário</th><th class="num">Horas</th><th>Motivo</th></tr></thead>
+     <tbody>${list.map(x=>`<tr class="click" data-he="${x.id}" tabindex="0"><td class="num two"><b>${fmt(x.h.data)}</b><small>${DIAS[wd(x.h.data)]}</small></td><td class="two"><b>${nm(x.e)}</b>${x.e.matricula?`<small>${esc(x.e.matricula)}</small>`:''}</td><td><span class="teamcell">${mono(x.e.equipe)}${esc(x.e.equipe||'Sem equipe')}</span></td><td class="num">${esc(x.h.inicio)} às ${esc(x.h.fim)}${heMin(x.h)&&x.h.fim<=x.h.inicio?' <small class="dash">(+1 dia)</small>':''}</td><td class="num">${fmtH(x.min)}</td><td class="two"><b style="font-weight:400">${esc(x.h.motivo)}</b>${x.h.obs?`<small>${esc(x.h.obs)}</small>`:''}</td></tr>`).join('')||`<tr><td colspan="6" class="emptystate"><b>Nenhuma hora extra em ${MESES[m-1]}</b>Use Registrar hora extra para lançar a primeira.</td></tr>`}</tbody>
+     ${list.length?`<tfoot><tr><td colspan="4" class="num" style="color:var(--muted)">Total ${S.heTeam||S.heMotivo?'filtrado':'do mês'}</td><td class="num"><b>${fmtH(list.reduce((s,x)=>s+x.min,0))}</b></td><td></td></tr></tfoot>`:''}</table></div></section>
+   </div>`;
+  main.querySelector('#hp').onclick=()=>{S.heMonth=addMonths(m0,-1).slice(0,7);renderTab()};
+  main.querySelector('#hn').onclick=()=>{S.heMonth=addMonths(m0,1).slice(0,7);renderTab()};
+  main.querySelector('#hT').onchange=e=>{S.heTeam=e.target.value;renderTab()};
+  main.querySelector('#hM').onchange=e=>{S.heMotivo=e.target.value;renderTab()};
+  main.querySelector('#addHE').onclick=()=>heDialog();
+  main.querySelector('#expHE').onclick=exportHE;
+  main.querySelectorAll('[data-he]').forEach(r=>{r.onclick=()=>heDialog(r.dataset.he);r.onkeydown=e=>{if(e.key==='Enter')heDialog(r.dataset.he)}});
+}
+function heDialog(id){
+  const h=id?S.he[id]:{funcionarioId:'',data:todayISO(),inicio:'',fim:'',motivo:'',obs:''};
+  openDlg(`<h3>${id?'Editar hora extra':'Registrar hora extra'}</h3>
+   <div class="fgrid">
+    <label class="field full">Funcionário<select class="input" name="funcionarioId" required><option value="">Selecione</option>${empOptions(h.funcionarioId)}</select></label>
+    <label class="field full">Dia<input class="input" type="date" name="data" required value="${esc(h.data)}"></label>
+    <label class="field">Início<input class="input" type="time" name="inicio" required value="${esc(h.inicio)}"></label>
+    <label class="field">Fim<input class="input" type="time" name="fim" required value="${esc(h.fim)}"><span class="hint">Se terminar depois da meia-noite, conta no dia seguinte</span></label>
+    <div class="field full" style="font-weight:400;flex-direction:row;gap:6px">Total: <b id="heTot" style="font-weight:600">-</b></div>
+    <label class="field full">Motivo<select class="input" name="motivo" required><option value="">Selecione</option>${MOTIVOS_HE.map(t=>`<option ${h.motivo===t?'selected':''}>${t}</option>`).join('')}</select></label>
+    <label class="field full">Detalhe do motivo<textarea class="input" name="obs" rows="2" placeholder="Ex.: cobertura de falta no 18x06 da Delta">${esc(h.obs)}</textarea></label>
+   </div><div class="warnbox" id="hw"></div>
+   <div class="formfoot">${id?'<button type="button" class="btn danger left" id="delH">Excluir lançamento</button>':''}<button type="button" class="btn" data-close>Cancelar</button><button class="btn primary">Salvar</button></div>`,
+  v=>{if(!v.funcionarioId||!validISO(v.data)||!v.inicio||!v.fim||!v.motivo){toast('Preencha funcionário, dia, horário e motivo');return false}
+     if(v.inicio===v.fim){toast('Início e fim não podem ser iguais');return false}
+     if(v.motivo==='Outro'&&!v.obs.trim()){toast('Descreva o motivo no campo de detalhe');return false}
+     Store.put('he',id||uid('h'),{funcionarioId:v.funcionarioId,data:v.data,inicio:v.inicio,fim:v.fim,horas:+(heMin(v)/60).toFixed(2),motivo:v.motivo,obs:v.obs||''});toast('Hora extra salva')});
+  const form=document.getElementById('dlgForm');
+  const upd=()=>{const v=Object.fromEntries(new FormData(form));const w=[];
+    if(v.inicio&&v.fim&&v.inicio!==v.fim){const mm=heMin(v);document.getElementById('heTot').textContent=fmtH(mm)+(v.fim<v.inicio?', termina no dia seguinte':'');if(mm>4*60)w.push('Mais de 4 horas extras no mesmo lançamento. Confira o horário.')}else document.getElementById('heTot').textContent='-';
+    if(v.funcionarioId&&validISO(v.data)){const ab=absenceOf(v.funcionarioId,v.data);if(ab)w.push(`Nesse dia consta ${ab.tipo.toLowerCase()} para este funcionário.`);
+      const dup=Object.entries(S.he).find(([k,x])=>k!==id&&x.funcionarioId===v.funcionarioId&&x.data===v.data);if(dup)w.push('Já existe hora extra lançada para este funcionário nesse dia.')}
+    document.getElementById('hw').innerHTML=w.map(esc).join('<br>')};
+  form.oninput=upd;form.onchange=upd;upd();
+  if(id)document.getElementById('delH').onclick=()=>{if(confirm('Excluir este lançamento de hora extra?')){Store.del('he',id);closeDlg();toast('Lançamento excluído')}};
 }
 
 /* ===================== Diálogo, aviso e navegação ===================== */
@@ -1040,7 +1160,7 @@ function openDlg(html,onOk){
 function closeDlg(){dlg.close()}
 let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600)}
 
-const VIEWS={escala:viewEscala,equipes:viewEquipes,ferias:viewFerias,afast:viewAfast};
+const VIEWS={escala:viewEscala,equipes:viewEquipes,ferias:viewFerias,afast:viewAfast,he:viewHE};
 function renderTab(){
   const main=document.getElementById('main');renderSide();
   if(!S.ready){main.innerHTML=`<div class="titlerow"><div class="t"><h1>${TITLES[S.tab]}</h1><p class="finding">Carregando dados da equipe.</p></div></div>`;return}
